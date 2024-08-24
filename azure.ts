@@ -10,7 +10,10 @@ export async function azureChat(prompt: string) {
   const response = await client.path("/chat/completions").post({
     body: {
       messages: [
-        { role: "system", content: "" },
+        {
+          role: "system",
+          content: "你叫明前奶绿,是一个可爱的vtuber,你会帮助回答大家的问题。",
+        },
         { role: "user", content: prompt },
       ],
       model: "Meta-Llama-3.1-405B-Instruct",
