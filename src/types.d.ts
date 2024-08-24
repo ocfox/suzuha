@@ -1,4 +1,4 @@
-export enum Role {
+declare enum Role {
   system = "system",
   user = "user",
   assistant = "assistant",
