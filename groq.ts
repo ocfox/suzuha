@@ -14,7 +14,7 @@ export function getGroqChatCompletion(system: string, prompt: string) {
         content: prompt,
       },
     ],
-    model: "llama3.1-70b-versatile",
+    model: "llama-3.1-70b-versatile",
   });
 }
 
