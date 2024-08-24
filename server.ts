@@ -12,8 +12,13 @@ const handleUpdate = webhookCallback(bot, "std/http");
 Deno.serve(async (req) => {
   if (req.method === "POST") {
     const url = new URL(req.url);
+    console.log(url);
+    console.log(bot.token);
+
     if (url.pathname.slice(1) === bot.token) {
       try {
+        console.log("Handling update...");
+
         return await handleUpdate(req);
       } catch (err) {
         console.error(err);
