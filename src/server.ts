@@ -26,7 +26,7 @@ bot.on(":text", async (ctx) => {
     ctx.message?.reply_to_message &&
     ctx.message.reply_to_message.from?.id === bot.botInfo.id
   ) {
-    const prev = setReply(ctx.message.reply_to_message.message_id, ctx.msgId);
+    await setReply(ctx.message.reply_to_message.message_id, ctx.msgId);
 
     groqReply(ctx.msgId, ctx.message.text).then(async (response) => {
       const reply = await ctx.reply(response, {
@@ -34,7 +34,6 @@ bot.on(":text", async (ctx) => {
       });
       await setReply(ctx.msgId, reply.message_id);
     });
-    await prev;
   }
 });
 
