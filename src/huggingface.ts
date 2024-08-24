@@ -6,6 +6,8 @@ const hf = new HfInference(token);
 
 export async function fluxImage(prompt: string) {
   const image = await hf.textToImage({
+    endpointUrl:
+      "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
     inputs: prompt,
     model: "black-forest-labs/FLUX.1-schnell",
   });
