@@ -28,12 +28,9 @@ export async function getStartId(id: number): Promise<number> {
   const value = await kv.get([id]);
 
   if (typeof value.value === "number") {
-    console.log("loop: " + value.value);
-
     return getStartId(value.value);
   }
 
-  console.log(id);
   return id;
 }
 
