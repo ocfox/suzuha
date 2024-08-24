@@ -48,8 +48,6 @@ export async function groqReply(id: number, prompt: string) {
     return "Old messages don't support replies.";
   }
 
-  console.log(messages);
-
   const response = await getGroqChatCompletion(
     messages.concat({ role: Role.user, content: prompt })
   );
