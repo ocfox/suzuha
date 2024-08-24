@@ -9,9 +9,7 @@ export async function fluxImage(prompt: string) {
     endpointUrl:
       "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
     inputs: prompt,
-    model: "black-forest-labs/FLUX.1-schnell",
   });
-  console.log(image);
 
   return image;
 }

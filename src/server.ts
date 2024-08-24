@@ -23,6 +23,16 @@ bot.command("chat", (ctx) => {
   });
 });
 
+bot.command("image", async (ctx) => {
+  const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
+  if (!prompt) {
+    return ctx.reply("Please provide a prompt.");
+  }
+
+  const image = await fluxImage(prompt);
+  await ctx.replyWithPhoto(new InputFile(image));
+});
+
 bot.on(":text", async (ctx) => {
   if (
     ctx.message?.reply_to_message &&
@@ -37,16 +47,6 @@ bot.on(":text", async (ctx) => {
       await setReply(ctx.msgId, reply.message_id);
     });
   }
-});
-
-bot.command("image", async (ctx) => {
-  const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
-  if (!prompt) {
-    return ctx.reply("Please provide a prompt.");
-  }
-
-  const image = await fluxImage(prompt);
-  await ctx.replyWithPhoto(new InputFile(image));
 });
 
 const handleUpdate = webhookCallback(bot, "std/http");
