@@ -49,7 +49,9 @@ bot.on(":text", async (ctx) => {
   }
 });
 
-const handleUpdate = webhookCallback(bot, "std/http");
+const handleUpdate = webhookCallback(bot, "std/http", {
+  timeoutMilliseconds: 120_000,
+});
 
 Deno.serve(async (req) => {
   if (req.method === "POST") {
