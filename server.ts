@@ -2,17 +2,20 @@ import {
   webhookCallback,
   Bot,
 } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
-import { azureChat } from "./azure.ts";
+import { groqChat } from "./groq.ts";
 
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
 bot.command("start", (ctx) => ctx.reply("Hello! I am a bot!"));
+
 bot.command("chat", (ctx) => {
   const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
   if (!prompt) {
     return ctx.reply("Please provide a prompt.");
   }
-  azureChat(prompt).then((response) => ctx.reply(response));
+  groqChat(prompt).then((response) =>
+    ctx.reply(response, { reply_parameters: { message_id: ctx.msgId } })
+  );
 });
 
 const handleUpdate = webhookCallback(bot, "std/http");
