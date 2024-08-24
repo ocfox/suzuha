@@ -14,6 +14,7 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     console.log(url);
     console.log(bot.token);
+    console.log(req);
 
     if (url.pathname.slice(1) === bot.token) {
       try {
