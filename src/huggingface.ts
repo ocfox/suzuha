@@ -9,6 +9,7 @@ export async function fluxImage(prompt: string) {
     inputs: prompt,
     model: "black-forest-labs/FLUX.1-schnell",
   });
+  console.log(image);
 
   return image;
 }

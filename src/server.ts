@@ -46,7 +46,7 @@ bot.command("image", async (ctx) => {
   }
 
   const image = await fluxImage(prompt);
-  await ctx.replyWithPhoto(new InputFile(image.stream));
+  await ctx.replyWithPhoto(new InputFile(image));
 });
 
 const handleUpdate = webhookCallback(bot, "std/http");
