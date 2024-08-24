@@ -3,7 +3,7 @@ import {
   Bot,
 } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 
-import { groqChat } from "./groq.ts";
+import { groqChat, groqReply } from "./groq.ts";
 
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
@@ -22,7 +22,7 @@ bot.on(":text", (ctx) => {
     ctx.message?.reply_to_message &&
     ctx.message.reply_to_message.from?.id === bot.botInfo.id
   ) {
-    groqChat(ctx.msgId, ctx.message.text).then((response) =>
+    groqReply(ctx.msgId, ctx.message.text).then((response) =>
       ctx.reply(response, { reply_parameters: { message_id: ctx.msgId } })
     );
   }
