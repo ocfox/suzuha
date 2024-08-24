@@ -1,5 +1,6 @@
 import { Groq } from "groq-sdk";
 import { getStartMessages, init, updateChat } from "./kv.ts";
+import { Role, Message } from "./types.ts";
 
 const groq = new Groq({ apiKey: Deno.env.get("GROQ_TOKEN") || "" });
 

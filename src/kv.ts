@@ -1,3 +1,5 @@
+import { Message, Role } from "./types.ts";
+
 const kv = await Deno.openKv();
 
 export async function init(id: number, data: Message[]) {
