@@ -40,3 +40,7 @@ export async function getStartMessages(id: number): Promise<Message[] | null> {
 
   return value.value;
 }
+
+export async function setReply(prevId: number, id: number) {
+  await kv.set([id], prevId);
+}

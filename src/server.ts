@@ -4,6 +4,7 @@ import {
 } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 
 import { groqChat, groqReply } from "./groq.ts";
+import { setReply } from "./kv.ts";
 
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
@@ -22,9 +23,12 @@ bot.on(":text", (ctx) => {
     ctx.message?.reply_to_message &&
     ctx.message.reply_to_message.from?.id === bot.botInfo.id
   ) {
-    groqReply(ctx.msgId, ctx.message.text).then((response) =>
-      ctx.reply(response, { reply_parameters: { message_id: ctx.msgId } })
-    );
+    groqReply(ctx.msgId, ctx.message.text).then(async (response) => {
+      const reply = await ctx.reply(response, {
+        reply_parameters: { message_id: ctx.msgId },
+      });
+      await setReply(ctx.msgId, reply.message_id);
+    });
   }
 });
 
