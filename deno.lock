@@ -3,7 +3,8 @@
   "packages": {
     "specifiers": {
       "jsr:@std/assert@1": "jsr:@std/assert@1.0.2",
-      "jsr:@std/internal@^1.0.1": "jsr:@std/internal@1.0.1"
+      "jsr:@std/internal@^1.0.1": "jsr:@std/internal@1.0.1",
+      "npm:@azure-rest/ai-inference@1.0.0-beta.1": "npm:@azure-rest/ai-inference@1.0.0-beta.1"
     },
     "jsr": {
       "@std/assert@1.0.2": {
@@ -14,6 +15,126 @@
       },
       "@std/internal@1.0.1": {
         "integrity": "6f8c7544d06a11dd256c8d6ba54b11ed870aac6c5aeafff499892662c57673e6"
+      }
+    },
+    "npm": {
+      "@azure-rest/ai-inference@1.0.0-beta.1": {
+        "integrity": "sha512-xa4MmvSo5+EfMNd/sTFy1kfJg1KTqO/+q0aurPNkjooJd8fQnfyXJ0XYTh7/mn4kNcVIJ7dSrxVoOxlybdcIeQ==",
+        "dependencies": {
+          "@azure-rest/core-client": "@azure-rest/core-client@2.2.0",
+          "@azure/abort-controller": "@azure/abort-controller@1.1.0",
+          "@azure/core-auth": "@azure/core-auth@1.7.2",
+          "@azure/core-lro": "@azure/core-lro@2.7.2",
+          "@azure/core-rest-pipeline": "@azure/core-rest-pipeline@1.16.3",
+          "@azure/logger": "@azure/logger@1.1.4",
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure-rest/core-client@2.2.0": {
+        "integrity": "sha512-2uPSZPRb2TRyYONl5IcsWhX7C1xbm6Gof/tcLlDnYg7fCVcEfASfySKZ9OTHxhNeFgo79LhrT6juEoxTHvrXkQ==",
+        "dependencies": {
+          "@azure/abort-controller": "@azure/abort-controller@2.1.2",
+          "@azure/core-auth": "@azure/core-auth@1.7.2",
+          "@azure/core-rest-pipeline": "@azure/core-rest-pipeline@1.16.3",
+          "@azure/core-tracing": "@azure/core-tracing@1.1.2",
+          "@azure/core-util": "@azure/core-util@1.9.2",
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/abort-controller@1.1.0": {
+        "integrity": "sha512-TrRLIoSQVzfAJX9H1JeFjzAoDGcoK1IYX1UImfceTZpsyYfWr09Ss1aHW1y5TrrR3iq6RZLBwJ3E24uwPhwahw==",
+        "dependencies": {
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/abort-controller@2.1.2": {
+        "integrity": "sha512-nBrLsEWm4J2u5LpAPjxADTlq3trDgVZZXHNKabeXZtpq3d3AbN/KGO82R87rdDz5/lYB024rtEf10/q0urNgsA==",
+        "dependencies": {
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/core-auth@1.7.2": {
+        "integrity": "sha512-Igm/S3fDYmnMq1uKS38Ae1/m37B3zigdlZw+kocwEhh5GjyKjPrXKO2J6rzpC1wAxrNil/jX9BJRqBshyjnF3g==",
+        "dependencies": {
+          "@azure/abort-controller": "@azure/abort-controller@2.1.2",
+          "@azure/core-util": "@azure/core-util@1.9.2",
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/core-lro@2.7.2": {
+        "integrity": "sha512-0YIpccoX8m/k00O7mDDMdJpbr6mf1yWo2dfmxt5A8XVZVVMz2SSKaEbMCeJRvgQ0IaSlqhjT47p4hVIRRy90xw==",
+        "dependencies": {
+          "@azure/abort-controller": "@azure/abort-controller@2.1.2",
+          "@azure/core-util": "@azure/core-util@1.9.2",
+          "@azure/logger": "@azure/logger@1.1.4",
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/core-rest-pipeline@1.16.3": {
+        "integrity": "sha512-VxLk4AHLyqcHsfKe4MZ6IQ+D+ShuByy+RfStKfSjxJoL3WBWq17VNmrz8aT8etKzqc2nAeIyLxScjpzsS4fz8w==",
+        "dependencies": {
+          "@azure/abort-controller": "@azure/abort-controller@2.1.2",
+          "@azure/core-auth": "@azure/core-auth@1.7.2",
+          "@azure/core-tracing": "@azure/core-tracing@1.1.2",
+          "@azure/core-util": "@azure/core-util@1.9.2",
+          "@azure/logger": "@azure/logger@1.1.4",
+          "http-proxy-agent": "http-proxy-agent@7.0.2",
+          "https-proxy-agent": "https-proxy-agent@7.0.5",
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/core-tracing@1.1.2": {
+        "integrity": "sha512-dawW9ifvWAWmUm9/h+/UQ2jrdvjCJ7VJEuCJ6XVNudzcOwm53BFZH4Q845vjfgoUAM8ZxokvVNxNxAITc502YA==",
+        "dependencies": {
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/core-util@1.9.2": {
+        "integrity": "sha512-l1Qrqhi4x1aekkV+OlcqsJa4AnAkj5p0JV8omgwjaV9OAbP41lvrMvs+CptfetKkeEaGRGSzby7sjPZEX7+kkQ==",
+        "dependencies": {
+          "@azure/abort-controller": "@azure/abort-controller@2.1.2",
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "@azure/logger@1.1.4": {
+        "integrity": "sha512-4IXXzcCdLdlXuCG+8UKEwLA1T1NHqUfanhXYHiQTn+6sfWCZXduqbtXDGceg3Ce5QxTGo7EqmbV6Bi+aqKuClQ==",
+        "dependencies": {
+          "tslib": "tslib@2.7.0"
+        }
+      },
+      "agent-base@7.1.1": {
+        "integrity": "sha512-H0TSyFNDMomMNJQBn8wFV5YC/2eJ+VXECwOadZJT554xP6cODZHPX3H9QMQECxvrgiSOP1pHjy1sMWQVYJOUOA==",
+        "dependencies": {
+          "debug": "debug@4.3.6"
+        }
+      },
+      "debug@4.3.6": {
+        "integrity": "sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==",
+        "dependencies": {
+          "ms": "ms@2.1.2"
+        }
+      },
+      "http-proxy-agent@7.0.2": {
+        "integrity": "sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==",
+        "dependencies": {
+          "agent-base": "agent-base@7.1.1",
+          "debug": "debug@4.3.6"
+        }
+      },
+      "https-proxy-agent@7.0.5": {
+        "integrity": "sha512-1e4Wqeblerz+tMKPIq2EMGiiWW1dIjZOksyHWSUm1rmuvw/how9hBHZ38lAGj5ID4Ik6EdkOw7NmWPy6LAwalw==",
+        "dependencies": {
+          "agent-base": "agent-base@7.1.1",
+          "debug": "debug@4.3.6"
+        }
+      },
+      "ms@2.1.2": {
+        "integrity": "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==",
+        "dependencies": {}
+      },
+      "tslib@2.7.0": {
+        "integrity": "sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==",
+        "dependencies": {}
       }
     }
   },
