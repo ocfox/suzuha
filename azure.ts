@@ -24,7 +24,7 @@ export async function azureChat(prompt: string) {
   });
 
   if (isUnexpected(response)) {
-    return "I'm sorry, I can't do that.";
+    return response.body.error.message;
   }
 
   const answer = response.body.choices[0].message.content;
