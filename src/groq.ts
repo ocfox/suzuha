@@ -49,10 +49,7 @@ export async function groqReply(id: number, prompt: string) {
   }
 
   const response = await getGroqChatCompletion(
-    messages.concat({
-      role: Role.user,
-      content: prompt,
-    })
+    messages.concat({ role: Role.user, content: prompt })
   );
 
   const answer = response.choices[0].message.content;
