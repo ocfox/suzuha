@@ -13,22 +13,28 @@ bot.command("chat", (ctx) => {
   if (!prompt) {
     return ctx.reply("Please provide a prompt.");
   }
-  groqChat(ctx.msgId, prompt).then((response) =>
-    ctx.reply(response, { reply_parameters: { message_id: ctx.msgId } })
-  );
+  groqChat(ctx.msgId, prompt).then(async (response) => {
+    const reply = await ctx.reply(response, {
+      reply_parameters: { message_id: ctx.msgId },
+    });
+    await setReply(ctx.msgId, reply.message_id);
+  });
 });
 
-bot.on(":text", (ctx) => {
+bot.on(":text", async (ctx) => {
   if (
     ctx.message?.reply_to_message &&
     ctx.message.reply_to_message.from?.id === bot.botInfo.id
   ) {
+    const prev = setReply(ctx.message.reply_to_message.message_id, ctx.msgId);
+
     groqReply(ctx.msgId, ctx.message.text).then(async (response) => {
       const reply = await ctx.reply(response, {
         reply_parameters: { message_id: ctx.msgId },
       });
       await setReply(ctx.msgId, reply.message_id);
     });
+    await prev;
   }
 });
 
