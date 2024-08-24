@@ -18,6 +18,17 @@ bot.command("chat", (ctx) => {
   );
 });
 
+bot.on(":text", (ctx) => {
+  if (
+    ctx.message?.reply_to_message &&
+    ctx.message.reply_to_message.from?.id === bot.botInfo.id
+  ) {
+    groqChat(ctx.message.text).then((response) =>
+      ctx.reply(response, { reply_parameters: { message_id: ctx.msgId } })
+    );
+  }
+});
+
 const handleUpdate = webhookCallback(bot, "std/http");
 
 Deno.serve(async (req) => {
