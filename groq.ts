@@ -25,6 +25,10 @@ export async function groqChat(prompt: string) {
   );
 
   const answer = response.choices[0].message.content;
+  const time = response.usage?.total_time;
+  const tokens = response.usage?.total_tokens;
 
-  return answer ? answer : "奶绿不知道";
+  return answer
+    ? answer + "\n Time used:" + time + "\n Token used" + tokens
+    : "奶绿不知道";
 }
