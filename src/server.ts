@@ -5,6 +5,8 @@ import {
 
 import { groqChat, groqReply } from "./groq.ts";
 import { setReply } from "./kv.ts";
+import { fluxImage } from "./huggingface.ts";
+import { InputFile } from "https://deno.land/x/grammy@v1.29.0/types.deno.ts";
 
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
@@ -35,6 +37,16 @@ bot.on(":text", async (ctx) => {
       await setReply(ctx.msgId, reply.message_id);
     });
   }
+});
+
+bot.command("image", async (ctx) => {
+  const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
+  if (!prompt) {
+    return ctx.reply("Please provide a prompt.");
+  }
+
+  const image = await fluxImage(prompt);
+  await ctx.replyWithPhoto(new InputFile(image.stream));
 });
 
 const handleUpdate = webhookCallback(bot, "std/http");
