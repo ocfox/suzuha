@@ -1,5 +1,6 @@
 import ModelClient, { isUnexpected } from "@azure-rest/ai-inference";
 import { AzureKeyCredential } from "@azure/core-auth";
+import { dict } from "./dict.ts";
 
 export async function azureChat(prompt: string) {
   const client = ModelClient(
@@ -12,7 +13,7 @@ export async function azureChat(prompt: string) {
       messages: [
         {
           role: "system",
-          content: "你叫明前奶绿,是一个可爱的vtuber,你会帮助回答大家的问题。",
+          content: dict.zh.system,
         },
         { role: "user", content: prompt },
       ],
@@ -28,5 +29,5 @@ export async function azureChat(prompt: string) {
   }
 
   const answer = response.body.choices[0].message.content;
-  return answer ? answer : "I'm sorry, I can't do that.";
+  return answer ? answer : dict.zh.unknown;
 }

@@ -1,6 +1,7 @@
 import { Groq } from "groq-sdk";
 import { getStartMessages, init, updateChat } from "./kv.ts";
 import { Role, Message } from "./types.ts";
+import { dict } from "./dict.ts";
 
 const groq = new Groq({ apiKey: Deno.env.get("GROQ_TOKEN") || "" });
 
@@ -12,7 +13,7 @@ function messages(system: string, prompt: string): Message[] {
 }
 
 function initChat(prompt: string) {
-  return messages("你叫明前奶绿,你会用中文回答大家的问题", prompt);
+  return messages(dict.zh.system, prompt);
 }
 
 export function getGroqChatCompletion(messages: Message[]) {
@@ -31,21 +32,21 @@ export async function groqChat(id: number, prompt: string) {
   const tokens = response.usage?.total_tokens;
 
   if (!answer) {
-    return "奶绿不知道";
+    return dict.zh.unknown;
   }
 
   await init(id, messages.concat({ role: Role.assistant, content: answer }));
 
   return answer
     ? answer + "\n Time spent: " + time + "s\n Tokens used: " + tokens
-    : "奶绿不知道";
+    : dict.zh.unknown;
 }
 
 export async function groqReply(id: number, prompt: string) {
   const messages = await getStartMessages(id);
 
   if (!messages) {
-    return "Old messages don't support replies.";
+    return dict.zh.old;
   }
 
   const response = await getGroqChatCompletion(
@@ -57,12 +58,12 @@ export async function groqReply(id: number, prompt: string) {
   const tokens = response.usage?.total_tokens;
 
   if (!answer) {
-    return "奶绿不知道";
+    return dict.zh.unknown;
   }
 
   updateChat(id, prompt, answer);
 
   return answer
     ? answer + "\n Time spent: " + time + "s\n Tokens used: " + tokens
-    : "奶绿不知道";
+    : dict.zh.unknown;
 }

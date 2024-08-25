@@ -7,13 +7,14 @@ import { groqChat, groqReply } from "./groq.ts";
 import { setReply } from "./kv.ts";
 import { fluxImage } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy@v1.29.0/types.deno.ts";
+import { dict } from "./dict.ts";
 
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
 bot.command("chat", (ctx) => {
   const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
   if (!prompt) {
-    return ctx.reply("Please provide a prompt.");
+    return ctx.reply(dict.zh.empty);
   }
   groqChat(ctx.msgId, prompt).then(async (response) => {
     const reply = await ctx.reply(response, {
@@ -26,7 +27,7 @@ bot.command("chat", (ctx) => {
 bot.command("image", async (ctx) => {
   const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
   if (!prompt) {
-    return ctx.reply("Please provide a prompt.");
+    return ctx.reply(dict.zh.empty);
   }
 
   const image = await fluxImage(prompt);
@@ -50,7 +51,7 @@ bot.on(":text", async (ctx) => {
 });
 
 const handleUpdate = webhookCallback(bot, "std/http", {
-  timeoutMilliseconds: 120_000,
+  timeoutMilliseconds: 300_000,
 });
 
 Deno.serve(async (req) => {
