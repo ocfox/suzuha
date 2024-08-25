@@ -67,10 +67,13 @@ bot.command("ah", (ctx) => {
   }
   const question = ctx.message.reply_to_message.text;
   let prompt;
+
   if (question.endsWith("吧")) {
     prompt = question.slice(0, -1) + "吗?";
+  } else if (!question.endsWith("?") || !question.endsWith("？")) {
+    prompt = question + "?";
   }
-  prompt = question + "?";
+  prompt = question;
 
   groqChat(ctx.msgId, prompt).then(async (response) => {
     await ctx.reply(response, {
