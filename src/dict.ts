@@ -6,6 +6,7 @@ export const dict = {
     unknown: "I don't know.",
     old: "Old messages don't support replies.",
     sorry: "I'm sorry, I can't do that.",
+    noImage: "Please reply to an image or send an image.",
   },
   zh: {
     system: "你叫明前奶绿,是一个vtuber,你会帮助回答大家的问题。",
@@ -13,5 +14,6 @@ export const dict = {
     unknown: "奶绿不知道。",
     old: "旧消息不支持回复。",
     sorry: "对不起，我不能这样做。",
+    noImage: "请回复或者发送一张图片。",
   },
 };

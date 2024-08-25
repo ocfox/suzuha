@@ -1,15 +1,26 @@
 import {
   webhookCallback,
   Bot,
+  Context,
 } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 
 import { groqChat, groqReply } from "./groq.ts";
 import { setReply } from "./kv.ts";
-import { fluxImage } from "./huggingface.ts";
+import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy@v1.29.0/types.deno.ts";
 import { dict } from "./dict.ts";
 
-export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
+const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
+
+const getFile = async (ctx: Context, fileId: string) => {
+  const file = await ctx.api.getFile(fileId);
+  const response = await fetch(
+    `https://api.telegram.org/file/bot${Deno.env.get("BOT_TOKEN")}/${
+      file.file_path
+    }`
+  );
+  return response.blob();
+};
 
 bot.command("chat", (ctx) => {
   const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
@@ -34,6 +45,17 @@ bot.command("image", async (ctx) => {
   await ctx.replyWithPhoto(new InputFile(image), {
     reply_parameters: { message_id: ctx.msgId },
   });
+});
+
+bot.command("i2i", async (ctx) => {
+  if (!ctx.message?.reply_to_message?.photo) {
+    return ctx.reply(dict.zh.noImage);
+  }
+
+  const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
+  const inputImageId = ctx.message.reply_to_message.photo[0].file_id;
+  const inputImage = await getFile(ctx, inputImageId);
+  const image = await StableDiffusionXLImg2Img(inputImage, prompt);
 });
 
 bot.on(":text", async (ctx) => {

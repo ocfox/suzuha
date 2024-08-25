@@ -13,3 +13,14 @@ export async function fluxImage(prompt: string) {
 
   return image;
 }
+
+export async function StableDiffusionXLImg2Img(img: Blob, prompt: string) {
+  const image = await hf.imageToImage({
+    endpointUrl:
+      "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-refiner-1.0",
+    inputs: img,
+    parameters: { prompt },
+  });
+
+  return image;
+}
