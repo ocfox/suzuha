@@ -88,6 +88,18 @@ bot.command("i2i", async (ctx) => {
   });
 });
 
+bot.command("help", (ctx) => {
+  ctx.reply(
+    "Commands:\n" +
+      "/chat <text> - Chat with the bot\n" +
+      "/what - Ask the bot what the previous message means\n" +
+      "/why - Ask the bot why the previous message\n" +
+      "/image <text> - Generate an image from text\n" +
+      "/i2i <text> - Generate an image from an image and text",
+    { reply_parameters: { message_id: ctx.msgId } }
+  );
+});
+
 bot.on(":text", async (ctx) => {
   if (
     ctx.message?.reply_to_message &&
