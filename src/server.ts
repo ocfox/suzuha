@@ -1,23 +1,23 @@
 import {
-  webhookCallback,
   Bot,
   Context,
+  webhookCallback,
 } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 
 import { groqChat, groqReply } from "./groq.ts";
 import { setReply } from "./kv.ts";
+import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy@v1.29.0/types.deno.ts";
-import { dict } from "./dict.ts";
 
 const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
-    `https://api.telegram.org/file/bot${Deno.env.get("BOT_TOKEN")}/${
-      file.file_path
-    }`
+    `https://api.telegram.org/file/bot${
+      Deno.env.get("BOT_TOKEN")
+    }/${file.file_path}`,
   );
   return response.blob();
 };
@@ -96,7 +96,7 @@ bot.command("help", (ctx) => {
       "/why - Ask the bot why the previous message\n" +
       "/image <text> - Generate an image from text\n" +
       "/i2i <text> - Generate an image from an image and text",
-    { reply_parameters: { message_id: ctx.msgId } }
+    { reply_parameters: { message_id: ctx.msgId } },
   );
 });
 

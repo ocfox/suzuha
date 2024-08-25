@@ -5,7 +5,7 @@ import { dict } from "./dict.ts";
 export async function azureChat(prompt: string) {
   const client = ModelClient(
     "https://models.inference.ai.azure.com",
-    new AzureKeyCredential(Deno.env.get("GITHUB_TOKEN") || "")
+    new AzureKeyCredential(Deno.env.get("GITHUB_TOKEN") || ""),
   );
 
   const response = await client.path("/chat/completions").post({

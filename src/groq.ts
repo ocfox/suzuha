@@ -1,6 +1,6 @@
 import { Groq } from "groq-sdk";
 import { getStartMessages, init, updateChat } from "./kv.ts";
-import { Role, Message } from "./types.ts";
+import { Message, Role } from "./types.ts";
 import { dict } from "./dict.ts";
 
 const groq = new Groq({ apiKey: Deno.env.get("GROQ_TOKEN") || "" });
@@ -50,7 +50,7 @@ export async function groqReply(id: number, prompt: string) {
   }
 
   const response = await getGroqChatCompletion(
-    messages.concat({ role: Role.user, content: prompt })
+    messages.concat({ role: Role.user, content: prompt }),
   );
 
   const answer = response.choices[0].message.content;
