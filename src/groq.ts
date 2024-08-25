@@ -5,7 +5,7 @@ import { dict } from "./dict.ts";
 
 const groq = new Groq({ apiKey: Deno.env.get("GROQ_TOKEN") || "" });
 
-function messages(system: string, prompt: string): Message[] {
+function genMessages(system: string, prompt: string): Message[] {
   const systemMessage = { role: Role.system, content: system };
   const userMessage = { role: Role.user, content: prompt };
 
@@ -13,7 +13,7 @@ function messages(system: string, prompt: string): Message[] {
 }
 
 function initChat(prompt: string) {
-  return messages(dict.zh.system, prompt);
+  return genMessages(dict.zh.system, prompt);
 }
 
 export function getGroqChatCompletion(messages: Message[]) {
@@ -28,18 +28,28 @@ export async function groqChat(id: number, prompt: string) {
   const response = await getGroqChatCompletion(messages);
 
   const answer = response.choices[0].message.content;
-  const time = response.usage?.total_time;
-  const tokens = response.usage?.total_tokens;
-
   if (!answer) {
     return dict.zh.unknown;
   }
 
   await init(id, messages.concat({ role: Role.assistant, content: answer }));
 
-  return answer
-    ? answer + "\n Time spent: " + time + "s\n Tokens used: " + tokens
-    : dict.zh.unknown;
+  return answer ? answer : dict.zh.unknown;
+}
+
+export async function groqTranslate(prompt: string) {
+  const messages = genMessages(
+    "你是一个翻译机器人，任何回复翻译成中文，要求简洁优雅。",
+    prompt,
+  );
+  const response = await getGroqChatCompletion(messages);
+  const answer = response.choices[0].message.content;
+
+  if (!answer) {
+    return dict.zh.unknown;
+  }
+
+  return answer ? answer : dict.zh.unknown;
 }
 
 export async function groqReply(id: number, prompt: string) {

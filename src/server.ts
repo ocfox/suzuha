@@ -4,7 +4,7 @@ import {
   webhookCallback,
 } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 
-import { groqChat, groqReply } from "./groq.ts";
+import { groqChat, groqReply, groqTranslate } from "./groq.ts";
 import { setReply } from "./kv.ts";
 import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
@@ -106,6 +106,19 @@ bot.command("i2i", async (ctx) => {
 
   await ctx.replyWithPhoto(new InputFile(image), {
     reply_parameters: { message_id: ctx.msgId },
+  });
+});
+
+bot.command("translate", (ctx) => {
+  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
+    return;
+  }
+  const prompt = ctx.message.reply_to_message.text;
+
+  groqTranslate(prompt).then(async (response) => {
+    await ctx.reply(response, {
+      reply_parameters: { message_id: ctx.msgId },
+    });
   });
 });
 
