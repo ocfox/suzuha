@@ -8,6 +8,7 @@ export const dict = {
     sorry: "I'm sorry, I can't do that.",
     noImage: "Please reply to an image or send an image.",
     what: "What is it?",
+    why: "Why",
   },
   zh: {
     system: "你叫明前奶绿,是一个vtuber,你会用中文帮助回答大家的问题。",
@@ -17,5 +18,6 @@ export const dict = {
     sorry: "对不起，我不能这样做。",
     noImage: "请回复或者发送一张图片。",
     what: "这是意思什么？",
+    why: "为什么",
   },
 };
