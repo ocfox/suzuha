@@ -54,8 +54,8 @@ export async function groqReply(id: number, prompt: string) {
   );
 
   const answer = response.choices[0].message.content;
-  const time = response.usage?.total_time;
-  const tokens = response.usage?.total_tokens;
+  // const time = response.usage?.total_time;
+  // const tokens = response.usage?.total_tokens;
 
   if (!answer) {
     return dict.zh.unknown;
@@ -63,7 +63,5 @@ export async function groqReply(id: number, prompt: string) {
 
   updateChat(id, prompt, answer);
 
-  return answer
-    ? answer + "\n Time spent: " + time + "s\n Tokens used: " + tokens
-    : dict.zh.unknown;
+  return answer ? answer : dict.zh.unknown;
 }
