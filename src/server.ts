@@ -31,12 +31,15 @@ bot.command("image", async (ctx) => {
   }
 
   const image = await fluxImage(prompt);
-  await ctx.replyWithPhoto(new InputFile(image));
+  await ctx.replyWithPhoto(new InputFile(image), {
+    reply_parameters: { message_id: ctx.msgId },
+  });
 });
 
 bot.on(":text", async (ctx) => {
   if (
     ctx.message?.reply_to_message &&
+    !ctx.message.reply_to_message.photo &&
     ctx.message.reply_to_message.from?.id === bot.botInfo.id
   ) {
     await setReply(ctx.message.reply_to_message.message_id, ctx.msgId);
