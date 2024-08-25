@@ -56,6 +56,10 @@ bot.command("i2i", async (ctx) => {
   const inputImageId = ctx.message.reply_to_message.photo[0].file_id;
   const inputImage = await getFile(ctx, inputImageId);
   const image = await StableDiffusionXLImg2Img(inputImage, prompt);
+
+  await ctx.replyWithPhoto(new InputFile(image), {
+    reply_parameters: { message_id: ctx.msgId },
+  });
 });
 
 bot.on(":text", async (ctx) => {
