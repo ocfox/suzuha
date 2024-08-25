@@ -119,7 +119,7 @@ bot.command("translate", (ctx) => {
   }
   const prompt = ctx.message.reply_to_message.text;
 
-  nllbTranslate(prompt).then(async (response) => {
+  groqTranslate(prompt).then(async (response) => {
     await ctx.reply(response, {
       reply_parameters: { message_id: ctx.msgId },
     });
