@@ -61,6 +61,24 @@ bot.command("why", (ctx) => {
   });
 });
 
+bot.command("ah", (ctx) => {
+  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
+    return;
+  }
+  const question = ctx.message.reply_to_message.text;
+  let prompt;
+  if (question.endsWith("吧")) {
+    prompt = question.slice(0, -1) + "吗?";
+  }
+  prompt = question + "?";
+
+  groqChat(ctx.msgId, prompt).then(async (response) => {
+    await ctx.reply(response, {
+      reply_parameters: { message_id: ctx.msgId },
+    });
+  });
+});
+
 bot.command("image", async (ctx) => {
   const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
   if (!prompt) {
@@ -91,6 +109,7 @@ bot.command("i2i", async (ctx) => {
 bot.command("help", (ctx) => {
   ctx.reply(
     "Commands:\n" +
+      "/ah - Ask from message\n" +
       "/chat <text> - Chat with the bot\n" +
       "/what - Ask the bot what the previous message means\n" +
       "/why - Ask the bot why the previous message\n" +
