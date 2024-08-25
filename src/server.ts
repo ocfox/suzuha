@@ -35,6 +35,19 @@ bot.command("chat", (ctx) => {
   });
 });
 
+bot.command("what", (ctx) => {
+  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
+    return;
+  }
+  const prompt = ctx.message.reply_to_message.text + "\n" + dict.zh.what;
+
+  groqChat(ctx.msgId, prompt).then(async (response) => {
+    await ctx.reply(response, {
+      reply_parameters: { message_id: ctx.msgId },
+    });
+  });
+});
+
 bot.command("image", async (ctx) => {
   const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
   if (!prompt) {
