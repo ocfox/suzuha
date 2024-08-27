@@ -20,9 +20,9 @@ export function getGroqChatCompletion(messages: Message[]) {
   return groq.chat.completions.create({
     messages: messages,
     model: "llama-3.1-70b-versatile",
-    temperature: 0,
+    temperature: 0.5,
     max_tokens: 1024,
-    top_p: 0,
+    top_p: 0.5,
   });
 }
 
