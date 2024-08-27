@@ -20,12 +20,20 @@ export function getGroqChatCompletion(messages: Message[]) {
   return groq.chat.completions.create({
     messages: messages,
     model: "llama-3.1-70b-versatile",
+    temperature: 0,
+    max_tokens: 1024,
+    top_p: 0,
   });
 }
 
 export async function groqChat(id: number, prompt: string) {
   const messages = initChat(prompt);
-  const response = await getGroqChatCompletion(messages);
+  let response;
+  try {
+    response = await getGroqChatCompletion(messages);
+  } catch (error) {
+    return error.error.message;
+  }
 
   const answer = response.choices[0].message.content;
   if (!answer) {
