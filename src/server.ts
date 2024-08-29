@@ -48,17 +48,21 @@ bot.command("what", (ctx) => {
   });
 });
 
-bot.command("why", (ctx) => {
+bot.command("why", async (ctx) => {
   if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
     return;
   }
   const prompt = dict.zh.why + ctx.message.reply_to_message.text + "?";
 
-  groqChat(ctx.msgId, prompt).then(async (response) => {
-    await ctx.reply(response, {
-      reply_parameters: { message_id: ctx.msgId },
+  try {
+    groqChat(ctx.msgId, prompt).then(async (response) => {
+      await ctx.reply(response, {
+        reply_parameters: { message_id: ctx.msgId },
+      });
     });
-  });
+  } catch (e) {
+    await ctx.reply(e);
+  }
 });
 
 bot.command("ah", (ctx) => {
