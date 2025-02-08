@@ -9,8 +9,18 @@ import { setReply } from "./kv.ts";
 import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy/types.deno.ts";
+import {
+  hydrateReply,
+  parseMode,
+} from "https://deno.land/x/grammy_parse_mode@1.11.1/mod.ts";
+import type { ParseModeFlavor } from "https://deno.land/x/grammy_parse_mode@1.11.1/mod.ts";
 
-const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
+const bot = new Bot<ParseModeFlavor<Context>>(Deno.env.get("BOT_TOKEN") || "");
+
+bot.use(hydrateReply);
+
+// Set the default parse mode for ctx.reply.
+bot.api.config.use(parseMode("MarkdownV2"));
 
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
