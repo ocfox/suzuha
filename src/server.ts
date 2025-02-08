@@ -20,7 +20,7 @@ const bot = new Bot<ParseModeFlavor<Context>>(Deno.env.get("BOT_TOKEN") || "");
 bot.use(hydrateReply);
 
 // Set the default parse mode for ctx.reply.
-bot.api.config.use(parseMode("MarkdownV2"));
+// bot.api.config.use(parseMode("MarkdownV2"));
 
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
