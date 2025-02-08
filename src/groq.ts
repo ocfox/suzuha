@@ -19,7 +19,7 @@ function initChat(prompt: string) {
 export function getGroqChatCompletion(messages: Message[]) {
   return groq.chat.completions.create({
     messages: messages,
-    model: "deepseek-r1-distill-llama-70b-specdec",
+    model: "deepseek-r1-distill-llama-70b",
   });
 }
 
