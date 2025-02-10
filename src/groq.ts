@@ -19,7 +19,7 @@ function initChat(prompt: string) {
 export function getGroqChatCompletion(messages: Message[]) {
   return groq.chat.completions.create({
     messages: messages,
-    model: "mixtral-8x7b-32768",
+    model: "llama-3.3-70b-versatile",
   });
 }
 
