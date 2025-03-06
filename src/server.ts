@@ -11,7 +11,7 @@ import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy@v1.34.1/types.deno.ts";
 import {
   hydrateReply,
-  parseMode,
+  // parseMode,
 } from "https://deno.land/x/grammy_parse_mode@1.11.1/mod.ts";
 import type { ParseModeFlavor } from "https://deno.land/x/grammy_parse_mode@1.11.1/mod.ts";
 
@@ -20,12 +20,13 @@ const bot = new Bot<ParseModeFlavor<Context>>(Deno.env.get("BOT_TOKEN") || "");
 bot.use(hydrateReply);
 
 // Set the default parse mode for ctx.reply.
-bot.api.config.use(parseMode("MarkdownV2"));
+// bot.api.config.use(parseMode("MarkdownV2"));
 
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
-    `https://api.telegram.org/file/bot${Deno.env.get("BOT_TOKEN")
+    `https://api.telegram.org/file/bot${
+      Deno.env.get("BOT_TOKEN")
     }/${file.file_path}`,
   );
   return response.blob();
@@ -152,12 +153,12 @@ bot.command("translate", (ctx) => {
 bot.command("help", (ctx) => {
   ctx.reply(
     "Commands:\n" +
-    "/ah - Ask from message\n" +
-    "/chat <text> - Chat with the bot\n" +
-    "/what - Ask the bot what the previous message means\n" +
-    "/why - Ask the bot why the previous message\n" +
-    "/image <text> - Generate an image from text\n" +
-    "/i2i <text> - Generate an image from an image and text",
+      "/ah - Ask from message\n" +
+      "/chat <text> - Chat with the bot\n" +
+      "/what - Ask the bot what the previous message means\n" +
+      "/why - Ask the bot why the previous message\n" +
+      "/image <text> - Generate an image from text\n" +
+      "/i2i <text> - Generate an image from an image and text",
     { reply_parameters: { message_id: ctx.msgId } },
   );
 });
