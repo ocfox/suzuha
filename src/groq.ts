@@ -86,10 +86,11 @@ export async function groqReply(id: number, prompt: string) {
 
 
 export async function whisper(audioFile: Blob) {
+  const voice = new File([audioFile], "voice.ogg");
   const transcription = await groq.audio.transcriptions.create({
-    file: new File([audioFile], "audio.wav", { lastModified: Date.now() }),
+    file: voice,
     model: "whisper-large-v3-turbo",
-    response_format: "text",
+    response_format: "json",
   });
 
   return transcription.text;
