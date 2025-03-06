@@ -123,11 +123,11 @@ bot.command("i2i", async (ctx) => {
 });
 
 bot.command("whisper", async (ctx) => {
-  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.audio || !ctx.message.reply_to_message.voice) {
+  if (!ctx.message?.reply_to_message?.voice) {
     return ctx.reply(dict.zh.noAudio);
   }
 
-  const inputAudioId = ctx.message.reply_to_message.audio.file_id;
+  const inputAudioId = ctx.message.reply_to_message.voice.file_id;
   const inputAudio = await getFile(ctx, inputAudioId);
   const text = await whisper(inputAudio);
 
