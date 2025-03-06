@@ -85,13 +85,28 @@ export async function groqReply(id: number, prompt: string) {
 }
 
 
-export async function whisper(audioFile: Blob) {
+export async function whisper(audioFile: Blob, toChinese: boolean) {
   const voice = new File([audioFile], "voice.ogg");
   const transcription = await groq.audio.transcriptions.create({
     file: voice,
     model: "whisper-large-v3-turbo",
     response_format: "json",
   });
+
+  if (toChinese) {
+    const translationMessages = genMessages(
+      "你是一个翻译机器人，任何回复翻译成中文，要求简洁优雅。",
+      transcription.text,
+    );
+    const translationResponse = await getGroqChatCompletion(translationMessages);
+    const translatedText = translationResponse.choices[0].message.content;
+
+    if (!translatedText) {
+      return dict.zh.unknown;
+    }
+
+    return transcription.text + "\n" + translatedText;
+  }
 
   return transcription.text;
 }

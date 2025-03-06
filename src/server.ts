@@ -130,7 +130,8 @@ bot.command("whisper", async (ctx) => {
 
   const inputAudioId = ctx.message.reply_to_message.voice.file_id;
   const inputAudio = await getFile(ctx, inputAudioId);
-  const text = await whisper(inputAudio);
+  const toChinese = ctx.message?.text?.split(" ").slice(1).join(" ") === "zh";
+  const text = await whisper(inputAudio, toChinese);
 
   await ctx.reply(text, {
     reply_parameters: { message_id: ctx.msgId },
