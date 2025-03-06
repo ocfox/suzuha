@@ -2,13 +2,13 @@ import {
   Bot,
   Context,
   webhookCallback,
-} from "https://deno.land/x/grammy/mod.ts";
+} from "https://deno.land/x/grammy@v1.34.1/mod.ts";
 
-import { groqChat, groqReply, groqTranslate } from "./groq.ts";
+import { groqChat, groqReply, groqTranslate, whisper } from "./groq.ts";
 import { setReply } from "./kv.ts";
 import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
-import { InputFile } from "https://deno.land/x/grammy/types.deno.ts";
+import { InputFile } from "https://deno.land/x/grammy@v1.34.1/types.deno.ts";
 import {
   hydrateReply,
   parseMode,
@@ -25,8 +25,7 @@ bot.api.config.use(parseMode("MarkdownV2"));
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
-    `https://api.telegram.org/file/bot${
-      Deno.env.get("BOT_TOKEN")
+    `https://api.telegram.org/file/bot${Deno.env.get("BOT_TOKEN")
     }/${file.file_path}`,
   );
   return response.blob();
@@ -71,7 +70,7 @@ bot.command("why", async (ctx) => {
       });
     });
   } catch (e) {
-    await ctx.reply(e);
+    await ctx.reply(String(e));
   }
 });
 
@@ -123,6 +122,20 @@ bot.command("i2i", async (ctx) => {
   });
 });
 
+bot.command("whisper", async (ctx) => {
+  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.audio || !ctx.message.reply_to_message.voice) {
+    return ctx.reply(dict.zh.noAudio);
+  }
+
+  const inputAudioId = ctx.message.reply_to_message.audio.file_id;
+  const inputAudio = await getFile(ctx, inputAudioId);
+  const text = await whisper(inputAudio);
+
+  await ctx.reply(text, {
+    reply_parameters: { message_id: ctx.msgId },
+  });
+});
+
 bot.command("translate", (ctx) => {
   if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
     return;
@@ -139,12 +152,12 @@ bot.command("translate", (ctx) => {
 bot.command("help", (ctx) => {
   ctx.reply(
     "Commands:\n" +
-      "/ah - Ask from message\n" +
-      "/chat <text> - Chat with the bot\n" +
-      "/what - Ask the bot what the previous message means\n" +
-      "/why - Ask the bot why the previous message\n" +
-      "/image <text> - Generate an image from text\n" +
-      "/i2i <text> - Generate an image from an image and text",
+    "/ah - Ask from message\n" +
+    "/chat <text> - Chat with the bot\n" +
+    "/what - Ask the bot what the previous message means\n" +
+    "/why - Ask the bot why the previous message\n" +
+    "/image <text> - Generate an image from text\n" +
+    "/i2i <text> - Generate an image from an image and text",
     { reply_parameters: { message_id: ctx.msgId } },
   );
 });

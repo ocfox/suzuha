@@ -1,7 +1,7 @@
 import {
   HfInference,
   TranslationArgs,
-} from "https://esm.sh/@huggingface/inference@2.8.0";
+} from "https://esm.sh/@huggingface/inference@3.5.1";
 
 const token = Deno.env.get("HUGGINGFACE_TOKEN") || "";
 

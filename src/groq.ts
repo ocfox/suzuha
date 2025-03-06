@@ -29,7 +29,10 @@ export async function groqChat(id: number, prompt: string) {
   try {
     response = await getGroqChatCompletion(messages);
   } catch (error) {
-    return error.error.message;
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return "An unknown error occurred";
   }
 
   const answer = response.choices[0].message.content;
@@ -79,4 +82,15 @@ export async function groqReply(id: number, prompt: string) {
   updateChat(id, prompt, answer);
 
   return answer ? answer : dict.zh.unknown;
+}
+
+
+export async function whisper(audioFile: Blob) {
+  const transcription = await groq.audio.transcriptions.create({
+    file: new File([audioFile], "audio.wav", { lastModified: Date.now() }),
+    model: "whisper-large-v3-turbo",
+    response_format: "text",
+  });
+
+  return transcription.text;
 }
