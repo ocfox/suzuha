@@ -6,6 +6,7 @@ import {
 
 import { groqChat, groqReply, groqTranslate, whisper } from "./groq.ts";
 import { setReply } from "./kv.ts";
+import { googleChat, googleChatWrapper } from "./aistudio.ts";
 import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy@v1.34.1/types.deno.ts";
@@ -37,7 +38,7 @@ bot.command("chat", (ctx) => {
   if (!prompt) {
     return ctx.reply(dict.zh.empty);
   }
-  groqChat(ctx.msgId, prompt).then(async (response) => {
+  googleChatWrapper(ctx.msgId, prompt).then(async (response) => {
     const reply = await ctx.reply(response, {
       reply_parameters: { message_id: ctx.msgId },
     });
