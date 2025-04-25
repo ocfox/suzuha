@@ -55,16 +55,32 @@ export async function initGoogleChat(id: number, data: Content[]) {
 }
 
 export async function updateGoogleChat(id: number, data: Content) {
-  const messages = await kv.get<Content[]>([`google:${id}`]);
+  const startId = await getGoogleStartId(id);
+  const messages = await kv.get<Content[]>([`google:${startId}`]);
   if (messages.value) {
-    await kv.set([`google:${id}`], [...messages.value, data]);
+    await kv.set([`google:${startId}`], [...messages.value, data]);
   } else {
-    await kv.set([`google:${id}`], [data]);
+    await kv.set([`google:${startId}`], [data]);
   }
 }
 
 export async function getGoogleChat(id: number) {
-  return await kv.get<Content[]>([`google:${id}`]);
+  const startId = await getGoogleStartId(id);
+  return await kv.get<Content[]>([`google:${startId}`]);
+}
+
+export async function setGoogleReply(prevId: number, id: number) {
+  await kv.set([`google:${id}`], prevId);
+}
+
+export async function getGoogleStartId(id: number): Promise<number> {
+  const value = await kv.get([`google:${id}`]);
+
+  if (typeof value.value === "number") {
+    return getGoogleStartId(value.value);
+  }
+
+  return id;
 }
 
 export async function appendGoogleMessage(
@@ -72,9 +88,16 @@ export async function appendGoogleMessage(
   role: string,
   text: string,
 ) {
+  const startId = await getGoogleStartId(id);
   const newContent: Content = {
     role: role,
     parts: [{ text }],
   };
-  await updateGoogleChat(id, newContent);
+
+  const messages = await kv.get<Content[]>([`google:${startId}`]);
+  if (messages.value) {
+    await kv.set([`google:${startId}`], [...messages.value, newContent]);
+  } else {
+    await kv.set([`google:${startId}`], [newContent]);
+  }
 }

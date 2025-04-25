@@ -2,17 +2,19 @@ import { Content, GoogleGenAI } from "@google/genai";
 import { appendGoogleMessage, getGoogleChat, initGoogleChat } from "./kv.ts";
 import { dict } from "./dict.ts";
 
+// Re-export the getGoogleChat function so it can be used by server.ts
+export { getGoogleChat } from "./kv.ts";
+
 const ai = new GoogleGenAI({
   apiKey: Deno.env.get("GOOGLE_API_KEY") || "",
 });
 
 export async function googleChatWrapper(id: number, prompt: string) {
   try {
-    // Create initial messages with user message including system instructions
     const initialMessages: Content[] = [
       {
         role: "user",
-        parts: [{ text: `${dict.zh.system}\n\n${prompt}` }],
+        parts: [{ text: prompt }],
       },
     ];
 
@@ -56,29 +58,29 @@ export async function googleChat(messages: Content[]) {
 
 export async function googleReply(id: number, prompt: string) {
   try {
-    // Get existing conversation history
+    // Get existing conversation history using the ID
     const messagesResult = await getGoogleChat(id);
-    let messages: Content[] = [];
 
-    // If no history, start a new conversation with system prompt embedded in user message
-    if (!messagesResult.value || messagesResult.value.length === 0) {
-      messages = [
-        {
-          role: "user",
-          parts: [{ text: `${dict.zh.system}\n\n${prompt}` }],
-        },
-      ];
-    } else {
-      messages = messagesResult.value;
+    // Add user's current message to the history
+    await appendGoogleMessage(id, "user", prompt);
 
-      // Add user's current message
-      await appendGoogleMessage(id, "user", prompt);
-
-      // Add user message to the messages array for the current request
-      messages.push({
+    // Prepare messages for API request - use history if available or create minimal context
+    let messages: Content[];
+    if (messagesResult.value && messagesResult.value.length > 0) {
+      // Use existing conversation history plus the new user message
+      messages = [...messagesResult.value, {
         role: "user",
         parts: [{ text: prompt }],
-      });
+      }];
+    } else {
+      // This should rarely happen in a reply scenario, but handle it just in case
+      console.warn(
+        `No history found for ID ${id} in googleReply, this is unusual for a reply.`,
+      );
+      messages = [{
+        role: "user",
+        parts: [{ text: prompt }],
+      }];
     }
 
     // Get response from Google AI Studio
@@ -92,7 +94,7 @@ export async function googleReply(id: number, prompt: string) {
       return dict.zh.unknown;
     }
 
-    // Save assistant's response
+    // Save assistant's response to the conversation
     await appendGoogleMessage(id, "model", answer);
 
     return answer;
