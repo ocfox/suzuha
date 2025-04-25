@@ -50,14 +50,17 @@ export async function groqTranslate(prompt: string) {
     "你是一个翻译机器人，任何回复翻译成中文，要求简洁优雅。",
     prompt,
   );
-  const response = await getGroqChatCompletion(messages);
-  const answer = response.choices[0].message.content;
 
-  if (!answer) {
-    return dict.zh.unknown;
+  try {
+    const response = await getGroqChatCompletion(messages);
+    const answer = response.choices[0].message.content;
+    return answer || dict.zh.unknown;
+  } catch (error) {
+    if (error instanceof Error) {
+      return `Translation error: ${error.message}`;
+    }
+    return "An unknown translation error occurred";
   }
-
-  return answer ? answer : dict.zh.unknown;
 }
 
 export async function groqReply(id: number, prompt: string) {
@@ -67,47 +70,65 @@ export async function groqReply(id: number, prompt: string) {
     return dict.zh.old;
   }
 
-  const response = await getGroqChatCompletion(
-    messages.concat({ role: Role.user, content: prompt }),
-  );
+  try {
+    const response = await getGroqChatCompletion(
+      messages.concat({ role: Role.user, content: prompt }),
+    );
 
-  const answer = response.choices[0].message.content;
-  // const time = response.usage?.total_time;
-  // const tokens = response.usage?.total_tokens;
+    const answer = response.choices[0].message.content;
+    // const time = response.usage?.total_time;
+    // const tokens = response.usage?.total_tokens;
 
-  if (!answer) {
-    return dict.zh.unknown;
+    if (!answer) {
+      return dict.zh.unknown;
+    }
+
+    updateChat(id, prompt, answer);
+    return answer;
+  } catch (error) {
+    if (error instanceof Error) {
+      return `Reply error: ${error.message}`;
+    }
+    return "An unknown reply error occurred";
   }
-
-  updateChat(id, prompt, answer);
-
-  return answer ? answer : dict.zh.unknown;
 }
 
 export async function whisper(audioFile: Blob, toChinese: boolean) {
   const voice = new File([audioFile], "voice.ogg");
-  const transcription = await groq.audio.transcriptions.create({
-    file: voice,
-    model: "whisper-large-v3-turbo",
-    response_format: "json",
-  });
 
-  if (toChinese) {
-    const translationMessages = genMessages(
-      "你是一个翻译机器人，任何回复翻译成中文，要求简洁优雅。",
-      transcription.text,
-    );
-    const translationResponse = await getGroqChatCompletion(
-      translationMessages,
-    );
-    const translatedText = translationResponse.choices[0].message.content;
+  try {
+    const transcription = await groq.audio.transcriptions.create({
+      file: voice,
+      model: "whisper-large-v3-turbo",
+      response_format: "json",
+    });
 
-    if (!translatedText) {
-      return dict.zh.unknown;
+    if (toChinese) {
+      try {
+        const translationMessages = genMessages(
+          "你是一个翻译机器人，任何回复翻译成中文，要求简洁优雅。",
+          transcription.text,
+        );
+        const translationResponse = await getGroqChatCompletion(
+          translationMessages,
+        );
+        const translatedText = translationResponse.choices[0].message.content;
+
+        if (!translatedText) {
+          return transcription.text + "\n" + dict.zh.unknown;
+        }
+
+        return transcription.text + "\n" + translatedText;
+      } catch (error) {
+        // Return original transcription with error message
+        return transcription.text + "\n" + "Translation error: " +
+          (error instanceof Error ? error.message : "Unknown error");
+      }
     }
 
-    return transcription.text + "\n" + translatedText;
+    return transcription.text;
+  } catch (error) {
+    return "Transcription error: " +
+      (error instanceof Error ? error.message : "Unknown error");
   }
-
-  return transcription.text;
 }

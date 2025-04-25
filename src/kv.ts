@@ -11,6 +11,9 @@ async function update(id: number, data: Message) {
   const messages = await kv.get<Message[]>([id]);
   if (messages.value) {
     await kv.set([id], messages.value.concat(data));
+  } else {
+    // Initialize with first message if no messages exist yet
+    await kv.set([id], [data]);
   }
 }
 
