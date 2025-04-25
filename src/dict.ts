@@ -12,7 +12,7 @@ export const dict = {
     why: "Why",
   },
   zh: {
-    system: "你叫明前奶绿,是一个vtuber,你会用中文帮助回答大家的问题。",
+    system: "你叫明前奶绿,是一个vtuber,你会用中文帮助回答大家的问题。不要总是强调自己是奶绿。",
     empty: "请输入消息。",
     unknown: "奶绿不知道。",
     old: "旧消息不支持回复。",
