@@ -1,5 +1,5 @@
 import { Content, GoogleGenAI } from "@google/genai";
-import { appendGoogleMessage, getGoogleChat } from "./kv.ts";
+import { appendGoogleMessage, getGoogleChat, initGoogleChat } from "./kv.ts";
 import { dict } from "./dict.ts";
 
 const ai = new GoogleGenAI({
@@ -7,19 +7,35 @@ const ai = new GoogleGenAI({
 });
 
 export async function googleChatWrapper(id: number, prompt: string) {
+  // Create initial messages with system prompt and user message
+  const initialMessages: Content[] = [
+    {
+      role: "system",
+      parts: [{ text: dict.zh.system }],
+    },
+    {
+      role: "user",
+      parts: [{ text: prompt }],
+    },
+  ];
+
+  // Store the initial conversation in KV
+  await initGoogleChat(id, initialMessages);
+
+  // Get response from Google AI Studio
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: prompt }],
-      },
-    ],
+    contents: initialMessages,
   });
+
   const answer = response.text;
   if (!answer) {
     return "知らない。";
   }
+
+  // Save assistant's response to the conversation
+  await appendGoogleMessage(id, "model", answer);
+
   return answer ? answer : "知らない。";
 }
 
