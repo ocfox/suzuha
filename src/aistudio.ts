@@ -8,15 +8,11 @@ const ai = new GoogleGenAI({
 
 export async function googleChatWrapper(id: number, prompt: string) {
   try {
-    // Create initial messages with system prompt and user message
+    // Create initial messages with user message including system instructions
     const initialMessages: Content[] = [
       {
-        role: "system",
-        parts: [{ text: dict.zh.system }],
-      },
-      {
         role: "user",
-        parts: [{ text: prompt }],
+        parts: [{ text: `${dict.zh.system}\n\n${prompt}` }],
       },
     ];
 
@@ -64,26 +60,26 @@ export async function googleReply(id: number, prompt: string) {
     const messagesResult = await getGoogleChat(id);
     let messages: Content[] = [];
 
-    // If no history, start a new conversation with system prompt
+    // If no history, start a new conversation with system prompt embedded in user message
     if (!messagesResult.value || messagesResult.value.length === 0) {
       messages = [
         {
-          role: "system",
-          parts: [{ text: dict.zh.system }],
+          role: "user",
+          parts: [{ text: `${dict.zh.system}\n\n${prompt}` }],
         },
       ];
     } else {
       messages = messagesResult.value;
+
+      // Add user's current message
+      await appendGoogleMessage(id, "user", prompt);
+
+      // Add user message to the messages array for the current request
+      messages.push({
+        role: "user",
+        parts: [{ text: prompt }],
+      });
     }
-
-    // Add user's current message
-    await appendGoogleMessage(id, "user", prompt);
-
-    // Add user message to the messages array for the current request
-    messages.push({
-      role: "user",
-      parts: [{ text: prompt }],
-    });
 
     // Get response from Google AI Studio
     const response = await ai.models.generateContent({
