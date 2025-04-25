@@ -6,7 +6,7 @@ import {
 
 import { groqChat, groqReply, groqTranslate, whisper } from "./groq.ts";
 import { setReply } from "./kv.ts";
-import { googleChat, googleChatWrapper } from "./aistudio.ts";
+import { googleChat, googleChatWrapper, googleReply } from "./aistudio.ts";
 import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy@v1.34.1/types.deno.ts";
@@ -173,7 +173,7 @@ bot.on(":text", async (ctx) => {
   ) {
     await setReply(ctx.message.reply_to_message.message_id, ctx.msgId);
 
-    groqReply(ctx.msgId, ctx.message.text).then(async (response) => {
+    googleReply(ctx.msgId, ctx.message.text).then(async (response) => {
       const reply = await ctx.reply(response, {
         reply_parameters: { message_id: ctx.msgId },
       });

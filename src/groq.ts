@@ -84,7 +84,6 @@ export async function groqReply(id: number, prompt: string) {
   return answer ? answer : dict.zh.unknown;
 }
 
-
 export async function whisper(audioFile: Blob, toChinese: boolean) {
   const voice = new File([audioFile], "voice.ogg");
   const transcription = await groq.audio.transcriptions.create({
@@ -98,7 +97,9 @@ export async function whisper(audioFile: Blob, toChinese: boolean) {
       "你是一个翻译机器人，任何回复翻译成中文，要求简洁优雅。",
       transcription.text,
     );
-    const translationResponse = await getGroqChatCompletion(translationMessages);
+    const translationResponse = await getGroqChatCompletion(
+      translationMessages,
+    );
     const translatedText = translationResponse.choices[0].message.content;
 
     if (!translatedText) {

@@ -1,4 +1,5 @@
 import { Message, Role } from "./types.ts";
+import { Content } from "@google/genai";
 
 const kv = await Deno.openKv();
 
@@ -43,4 +44,34 @@ export async function getStartMessages(id: number): Promise<Message[] | null> {
 
 export async function setReply(prevId: number, id: number) {
   await kv.set([id], prevId);
+}
+
+// Google AI Studio Content[] storage functions
+export async function initGoogleChat(id: number, data: Content[]) {
+  await kv.set([`google:${id}`], data);
+}
+
+export async function updateGoogleChat(id: number, data: Content) {
+  const messages = await kv.get<Content[]>([`google:${id}`]);
+  if (messages.value) {
+    await kv.set([`google:${id}`], [...messages.value, data]);
+  } else {
+    await kv.set([`google:${id}`], [data]);
+  }
+}
+
+export async function getGoogleChat(id: number) {
+  return await kv.get<Content[]>([`google:${id}`]);
+}
+
+export async function appendGoogleMessage(
+  id: number,
+  role: string,
+  text: string,
+) {
+  const newContent: Content = {
+    role: role,
+    parts: [{ text }],
+  };
+  await updateGoogleChat(id, newContent);
 }
