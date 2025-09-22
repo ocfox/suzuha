@@ -23,7 +23,7 @@ const bot = new Bot<ParseModeFlavor<Context>>(Deno.env.get("BOT_TOKEN") || "");
 bot.use(hydrateReply);
 
 // Set the default parse mode for ctx.reply.
-bot.api.config.use(parseMode("MarkdownV2"));
+// bot.api.config.use(parseMode("MarkdownV2"));
 
 // Helper function to send messages with markdown and fallback to plain text
 const sendWithMarkdown = async (
@@ -44,7 +44,7 @@ const sendWithMarkdown = async (
       error,
     );
     // If Markdown fails, fall back to plain text
-    const reply = await ctx.reply(text, {
+    const reply = await ctx.reply(telegramifyMarkdown(text, "remove"), {
       reply_parameters: { message_id: replyToMessageId },
       parse_mode: undefined, // No parsing
     });
