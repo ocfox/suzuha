@@ -4,6 +4,8 @@ import {
   webhookCallback,
 } from "https://deno.land/x/grammy@v1.34.1/mod.ts";
 
+import telegramifyMarkdown from 'telegramify-markdown';
+
 import { groqChat, groqTranslate, whisper } from "./groq.ts";
 import { setGoogleReply, setReply } from "./kv.ts";
 import { getGoogleChat, googleChatWrapper, googleReply } from "./aistudio.ts";
@@ -31,7 +33,7 @@ const sendWithMarkdown = async (
 ) => {
   try {
     // First try to send with Markdown formatting
-    const reply = await ctx.reply(text, {
+    const reply = await ctx.reply(telegramifyMarkdown(text, "escape"), {
       reply_parameters: { message_id: replyToMessageId },
       parse_mode: "MarkdownV2",
     });

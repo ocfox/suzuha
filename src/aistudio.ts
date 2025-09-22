@@ -23,7 +23,7 @@ export async function googleChatWrapper(id: number, prompt: string) {
 
     // Get response from Google AI Studio
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash-lite",
       contents: initialMessages,
     });
 
@@ -45,7 +45,7 @@ export async function googleChatWrapper(id: number, prompt: string) {
 export async function googleChat(messages: Content[]) {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash-lite",
       contents: messages,
     });
     const answer = response.text;
@@ -85,7 +85,7 @@ export async function googleReply(id: number, prompt: string) {
 
     // Get response from Google AI Studio
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash-lite",
       contents: messages,
     });
 
