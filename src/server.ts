@@ -26,37 +26,22 @@ bot.use(hydrateReply);
 // bot.api.config.use(parseMode("MarkdownV2"));
 
 // Helper function to send messages with markdown and fallback to plain text
-const sendWithMarkdown = async (
+const send = async (
   ctx: Context,
   text: string,
   replyToMessageId: number,
 ) => {
-  try {
-    // First try to send with Markdown formatting
-    const reply = await ctx.reply(telegramifyMarkdown(text, "escape"), {
-      reply_parameters: { message_id: replyToMessageId },
-      parse_mode: "MarkdownV2",
-    });
-    return reply;
-  } catch (error) {
-    console.log(
-      "Markdown formatting error, falling back to plain text:",
-      error,
-    );
-    // If Markdown fails, fall back to plain text
-    const reply = await ctx.reply(telegramifyMarkdown(text, "remove"), {
-      reply_parameters: { message_id: replyToMessageId },
-      parse_mode: undefined, // No parsing
-    });
-    return reply;
-  }
+  const reply = await ctx.reply(text, {
+    reply_parameters: { message_id: replyToMessageId },
+    parse_mode: undefined,
+  });
+  return reply;
 };
 
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
-    `https://api.telegram.org/file/bot${
-      Deno.env.get("BOT_TOKEN")
+    `https://api.telegram.org/file/bot${Deno.env.get("BOT_TOKEN")
     }/${file.file_path}`,
   );
   return response.blob();
@@ -70,7 +55,7 @@ bot.command("chat", (ctx) => {
 
   googleChatWrapper(ctx.msgId, prompt)
     .then(async (response) => {
-      const reply = await sendWithMarkdown(ctx, response, ctx.msgId);
+      const reply = await send(ctx, response, ctx.msgId);
       // Link both ways - standard and Google chat linking
       await setReply(ctx.msgId, reply.message_id);
       // This ensures that when someone replies to the bot's response,
@@ -79,8 +64,7 @@ bot.command("chat", (ctx) => {
     })
     .catch(async (error) => {
       await ctx.reply(
-        `Failed to process chat: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Failed to process chat: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },
@@ -97,12 +81,11 @@ bot.command("what", (ctx) => {
 
   groqChat(ctx.msgId, prompt)
     .then(async (response) => {
-      await sendWithMarkdown(ctx, response, ctx.msgId);
+      await send(ctx, response, ctx.msgId);
     })
     .catch(async (error) => {
       await ctx.reply(
-        `Failed to process request: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Failed to process request: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },
@@ -119,11 +102,10 @@ bot.command("why", async (ctx) => {
 
   try {
     const response = await groqChat(ctx.msgId, prompt);
-    await sendWithMarkdown(ctx, response, ctx.msgId);
+    await send(ctx, response, ctx.msgId);
   } catch (error) {
     await ctx.reply(
-      `Failed to process request: ${
-        error instanceof Error ? error.message : "Unknown error"
+      `Failed to process request: ${error instanceof Error ? error.message : "Unknown error"
       }`,
       {
         reply_parameters: { message_id: ctx.msgId },
@@ -147,12 +129,11 @@ bot.command("ah", (ctx) => {
 
   groqChat(ctx.msgId, prompt)
     .then(async (response) => {
-      await sendWithMarkdown(ctx, response, ctx.msgId);
+      await send(ctx, response, ctx.msgId);
     })
     .catch(async (error) => {
       await ctx.reply(
-        `Failed to process request: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Failed to process request: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },
@@ -174,8 +155,7 @@ bot.command("image", async (ctx) => {
     });
   } catch (error) {
     await ctx.reply(
-      `Failed to generate image: ${
-        error instanceof Error ? error.message : "Unknown error"
+      `Failed to generate image: ${error instanceof Error ? error.message : "Unknown error"
       }`,
       {
         reply_parameters: { message_id: ctx.msgId },
@@ -201,8 +181,7 @@ bot.command("i2i", async (ctx) => {
     });
   } catch (error) {
     await ctx.reply(
-      `Failed to process image: ${
-        error instanceof Error ? error.message : "Unknown error"
+      `Failed to process image: ${error instanceof Error ? error.message : "Unknown error"
       }`,
       {
         reply_parameters: { message_id: ctx.msgId },
@@ -222,11 +201,10 @@ bot.command("whisper", async (ctx) => {
     const toChinese = ctx.message?.text?.split(" ").slice(1).join(" ") === "zh";
     const text = await whisper(inputAudio, toChinese);
 
-    await sendWithMarkdown(ctx, text, ctx.msgId);
+    await send(ctx, text, ctx.msgId);
   } catch (error) {
     await ctx.reply(
-      `Failed to transcribe audio: ${
-        error instanceof Error ? error.message : "Unknown error"
+      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"
       }`,
       {
         reply_parameters: { message_id: ctx.msgId },
@@ -243,12 +221,11 @@ bot.command("translate", (ctx) => {
 
   groqTranslate(prompt)
     .then(async (response) => {
-      await sendWithMarkdown(ctx, response, ctx.msgId);
+      await send(ctx, response, ctx.msgId);
     })
     .catch(async (error) => {
       await ctx.reply(
-        `Translation error: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Translation error: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },
@@ -268,7 +245,7 @@ bot.command("help", (ctx) => {
     "/whisper - Transcribe audio (reply with 'zh' to translate to Chinese)\n" +
     "/translate - Translate text to Chinese";
 
-  sendWithMarkdown(ctx, helpText, ctx.msgId);
+  send(ctx, helpText, ctx.msgId);
 });
 
 bot.on(":text", async (ctx) => {
@@ -294,8 +271,7 @@ bot.on(":text", async (ctx) => {
     } catch (error) {
       console.error("Error retrieving chat history:", error);
       await ctx.reply(
-        `Failed to retrieve chat history: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Failed to retrieve chat history: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },
@@ -317,15 +293,14 @@ bot.on(":text", async (ctx) => {
 
       googleReply(ctx.msgId, ctx.message.text)
         .then(async (response) => {
-          const reply = await sendWithMarkdown(ctx, response, ctx.msgId);
+          const reply = await send(ctx, response, ctx.msgId);
           // Link the new reply in both systems
           await setReply(ctx.msgId, reply.message_id);
           await setGoogleReply(ctx.msgId, reply.message_id);
         })
         .catch(async (error) => {
           await ctx.reply(
-            `Error: ${
-              error instanceof Error ? error.message : "Unknown error"
+            `Error: ${error instanceof Error ? error.message : "Unknown error"
             }`,
             {
               reply_parameters: { message_id: ctx.msgId },
@@ -335,8 +310,7 @@ bot.on(":text", async (ctx) => {
     } catch (error) {
       console.error("Error in text message handling:", error);
       await ctx.reply(
-        `Failed to process message: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Failed to process message: ${error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },

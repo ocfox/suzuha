@@ -54,7 +54,14 @@ export async function googleChat(messages: Content[]) {
           {
             googleSearch: {},
           },
-        ]
+        ],
+        systemInstruction: [
+          {
+            text: `You are a helpful and accurate AI assistant. Your response should be in the same language as the user's prompt.
+              Never use markdown formatting; use plain text only. When mathematical formulas are needed, do not use latex.
+              Always provide factual information and avoid hallucination.`,
+          },
+        ],
       },
       contents: messages,
     });
