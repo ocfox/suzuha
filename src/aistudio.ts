@@ -9,6 +9,46 @@ const ai = new GoogleGenAI({
   apiKey: Deno.env.get("GOOGLE_API_KEY") || "",
 });
 
+const config = {
+  thinkingConfig: {
+    thinkingBudget: -1,
+  },
+  tools: [
+    {
+      googleSearch: {},
+    },
+  ],
+  systemInstruction: [
+    {
+      text: `
+You are an AI assistant with a strict output constraint. Your primary and most important directive is to communicate exclusively in plain text.
+
+Under no circumstances should your response contain any markdown formatting. This includes, but is not limited to:
+
+    Headings (e.g., #, ##)
+
+    Bold text (e.g., text or text)
+
+    Italicized text (e.g., text or text)
+
+    Unordered or ordered lists (e.g., *, -, 1., 2.)
+
+    Links (e.g., text)
+
+    Blockquotes (e.g., > quote)
+
+    Horizontal rules (e.g., --- or ***)
+
+    Inline code or code blocks (e.g., code or code)
+
+Always respond in the same language as the user's prompt. When presenting mathematical equations or formulas, write them out on a single line using standard characters (e.g., x = (-b +/- sqrt(b^2 - 4ac)) / 2a), do not use latex.
+
+Your absolute priority is adherence to the plain text format. Every response you generate must be pure, unformatted text.
+`,
+    },
+  ],
+};
+
 export async function googleChatWrapper(id: number, prompt: string) {
   try {
     const initialMessages: Content[] = [
@@ -24,6 +64,7 @@ export async function googleChatWrapper(id: number, prompt: string) {
     // Get response from Google AI Studio
     const response = await ai.models.generateContent({
       model: "gemini-flash-latest",
+      config,
       contents: initialMessages,
     });
 
@@ -46,23 +87,7 @@ export async function googleChat(messages: Content[]) {
   try {
     const response = await ai.models.generateContent({
       model: "gemini-flash-latest",
-      config: {
-        thinkingConfig: {
-          thinkingBudget: -1,
-        },
-        tools: [
-          {
-            googleSearch: {},
-          },
-        ],
-        systemInstruction: [
-          {
-            text: `You are a helpful and accurate AI assistant. Your response should be in the same language as the user's prompt.
-              Never use markdown formatting; use plain text only. When mathematical formulas are needed, do not use latex.
-              Always provide factual information and avoid hallucination.`,
-          },
-        ],
-      },
+      config,
       contents: messages,
     });
     const answer = response.text;
@@ -85,24 +110,30 @@ export async function googleReply(id: number, prompt: string) {
     let messages: Content[];
     if (messagesResult.value && messagesResult.value.length > 0) {
       // Use existing conversation history plus the new user message
-      messages = [...messagesResult.value, {
-        role: "user",
-        parts: [{ text: prompt }],
-      }];
+      messages = [
+        ...messagesResult.value,
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ];
     } else {
       // This should rarely happen in a reply scenario, but handle it just in case
       console.warn(
-        `No history found for ID ${id} in googleReply, this is unusual for a reply.`,
+        `No history found for ID ${id} in googleReply, this is unusual for a reply.`
       );
-      messages = [{
-        role: "user",
-        parts: [{ text: prompt }],
-      }];
+      messages = [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ];
     }
 
     // Get response from Google AI Studio
     const response = await ai.models.generateContent({
       model: "gemini-flash-latest",
+      config,
       contents: messages,
     });
 
