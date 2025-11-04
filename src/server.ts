@@ -31,7 +31,7 @@ const send = async (
 const handleChatCommand = async (ctx: Context, prompt: string) => {
   if (!ctx.msgId) return;
   try {
-    const response = await googleChatWrapper(ctx.msgId, prompt);
+    const response = await googleChatWrapper(ctx.msgId, prompt, ctx);
     const reply = await send(ctx, response, ctx.msgId);
     await setReply(ctx.msgId, reply.message_id);
     await setGoogleReply(ctx.msgId, reply.message_id);
