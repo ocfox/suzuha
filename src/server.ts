@@ -1,6 +1,6 @@
 import { Bot, Context, webhookCallback } from "grammy";
 
-import { groqTranslate, whisper } from "./groq.ts";
+import { whisper } from "./groq.ts";
 import { setGoogleReply, setReply } from "./kv.ts";
 import { getGoogleChat, googleChatWrapper, googleReply } from "./aistudio.ts";
 import { dict } from "./dict.ts";
@@ -179,25 +179,18 @@ bot.command("whisper", async (ctx) => {
 });
 
 bot.command("translate", (ctx) => {
-  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
+  const replyMsg = ctx.message?.reply_to_message;
+  if (!replyMsg) {
     return ctx.reply("Please reply to a message to translate it");
   }
-  const prompt = ctx.message.reply_to_message.text;
 
-  groqTranslate(prompt)
-    .then(async (response) => {
-      await send(ctx, response, ctx.msgId);
-    })
-    .catch(async (error) => {
-      await ctx.reply(
-        `Translation error: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-        {
-          reply_parameters: { message_id: ctx.msgId },
-        },
-      );
-    });
+  // Get the text to translate, or use a default prompt if it's just a photo
+  const textToTranslate = replyMsg.text || "";
+  const prompt = textToTranslate
+    ? `Translate the following to Chinese:\n${textToTranslate}`
+    : "Translate the text in this image to Chinese";
+
+  handleChatCommand(ctx, prompt, replyMsg.photo);
 });
 
 bot.command("help", (ctx) => {
@@ -209,7 +202,7 @@ bot.command("help", (ctx) => {
     "/image <text> - Generate an image from text\n" +
     "/i2i <text> - Generate an image from an image and text\n" +
     "/whisper - Transcribe audio (reply with 'zh' to translate to Chinese)\n" +
-    "/translate - Translate text to Chinese";
+    "/translate - Translate text or images to Chinese";
 
   send(ctx, helpText, ctx.msgId);
 });
