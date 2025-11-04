@@ -121,14 +121,20 @@ export async function whisper(audioFile: Blob, toChinese: boolean) {
         return transcription.text + "\n" + translatedText;
       } catch (error) {
         // Return original transcription with error message
-        return transcription.text + "\n" + "Translation error: " +
-          (error instanceof Error ? error.message : "Unknown error");
+        return (
+          transcription.text +
+          "\n" +
+          "Translation error: " +
+          (error instanceof Error ? error.message : "Unknown error")
+        );
       }
     }
 
     return transcription.text;
   } catch (error) {
-    return "Transcription error: " +
-      (error instanceof Error ? error.message : "Unknown error");
+    return (
+      "Transcription error: " +
+      (error instanceof Error ? error.message : "Unknown error")
+    );
   }
 }

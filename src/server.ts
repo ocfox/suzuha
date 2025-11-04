@@ -11,11 +11,7 @@ import { TelegramRenderer } from "./render.ts";
 
 const bot = new Bot<Context>(Deno.env.get("BOT_TOKEN") || "");
 
-const send = async (
-  ctx: Context,
-  text: string,
-  replyToMessageId: number,
-) => {
+const send = async (ctx: Context, text: string, replyToMessageId: number) => {
   const html = await marked(text, { renderer: new TelegramRenderer() });
   const reply = await ctx.reply(html, {
     reply_parameters: { message_id: replyToMessageId },
@@ -33,7 +29,7 @@ const handleChatCommand = async (
   try {
     // Create a modified context if we have a photo from reply
     const ctxToUse = photoArray
-      ? { ...ctx, message: { ...ctx.message, photo: photoArray } } as Context
+      ? ({ ...ctx, message: { ...ctx.message, photo: photoArray } } as Context)
       : ctx;
 
     const response = await googleChatWrapper(ctx.msgId, prompt, ctxToUse);
@@ -54,7 +50,9 @@ const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
     `https://api.telegram.org/file/bot${
-      Deno.env.get("BOT_TOKEN")
+      Deno.env.get(
+        "BOT_TOKEN",
+      )
     }/${file.file_path}`,
   );
   return response.blob();
@@ -77,7 +75,7 @@ bot.command("what", (ctx) => {
 
   // If has photo, use additional prompt or default question; otherwise use text + question
   const prompt = replyMsg.photo
-    ? (additionalPrompt || dict.zh.what)
+    ? additionalPrompt || dict.zh.what
     : `${replyMsg.text || ""}\n${dict.zh.what}`;
 
   handleChatCommand(ctx, prompt, replyMsg.photo);

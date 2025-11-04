@@ -62,14 +62,16 @@ export class TelegramRenderer extends Renderer {
     // marked sometimes fails to parse the second one
     if (token.text.includes("**")) {
       const parts = token.text.split(/\*\*(.+?)\*\*/g);
-      return parts.map((part, i) => {
-        // Odd indices are bold content (matched by the capture group)
-        if (i % 2 === 1) {
-          return `<b>${escapeHtml(part)}</b>`;
-        }
-        // Even indices are normal text
-        return escapeHtml(part);
-      }).join("");
+      return parts
+        .map((part, i) => {
+          // Odd indices are bold content (matched by the capture group)
+          if (i % 2 === 1) {
+            return `<b>${escapeHtml(part)}</b>`;
+          }
+          // Even indices are normal text
+          return escapeHtml(part);
+        })
+        .join("");
     }
     return escapeHtml(token.text);
   }
@@ -100,7 +102,9 @@ export class TelegramRenderer extends Renderer {
     const code = escapeHtml(token.text);
     return token.lang
       ? `<pre><code class="language-${
-        escapeHtml(token.lang)
+        escapeHtml(
+          token.lang,
+        )
       }">${code}</code></pre>`
       : wrapTag("pre", code);
   }
@@ -109,11 +113,11 @@ export class TelegramRenderer extends Renderer {
     const body = this.parser.parse(token.tokens).trim();
 
     const shouldExpand = body.split("\n").filter((line) => line.trim()).length >
-        EXPANDABLE_THRESHOLD.lines ||
-      body.length > EXPANDABLE_THRESHOLD.chars;
+        EXPANDABLE_THRESHOLD.lines || body.length > EXPANDABLE_THRESHOLD.chars;
 
-    return wrapTag("blockquote", body, shouldExpand ? "expandable" : "") +
-      "\n\n";
+    return (
+      wrapTag("blockquote", body, shouldExpand ? "expandable" : "") + "\n\n"
+    );
   }
 
   override heading(token: Tokens.Heading): string {

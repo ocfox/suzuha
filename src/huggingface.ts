@@ -53,8 +53,8 @@ export async function nllbTranslate(prompt: string) {
       },
     } as TranslationArgs);
 
-    const answer =
-      (response as unknown as { translation_text: string }).translation_text;
+    const answer = (response as unknown as { translation_text: string })
+      .translation_text;
 
     return answer;
   } catch (error) {

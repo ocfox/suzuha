@@ -45,6 +45,8 @@ const config = {
   systemInstruction: [
     {
       text: `
+Only use bold when really needed.
+
 Important: When presenting long content (more than 4 lines or 200 characters), always wrap it in a blockquote using > at the start of each line. This applies to:
 - Long explanations
 - Multi-paragraph responses
@@ -72,9 +74,10 @@ export async function googleChatWrapper(
   ctx?: Context,
 ) {
   try {
-    const parts: Array<
-      { text?: string; inlineData?: { mimeType: string; data: string } }
-    > = [];
+    const parts: Array<{
+      text?: string;
+      inlineData?: { mimeType: string; data: string };
+    }> = [];
 
     // Add image if present
     if (ctx?.message?.photo) {
@@ -90,14 +93,10 @@ export async function googleChatWrapper(
     // Add text prompt
     parts.push({ text: prompt });
 
-    const initialMessages: Content[] = [
-      { role: "user", parts },
-    ];
+    const initialMessages: Content[] = [{ role: "user", parts }];
 
     // Store only text parts in KV (images are too large)
-    const kvMessages: Content[] = [
-      { role: "user", parts: [{ text: prompt }] },
-    ];
+    const kvMessages: Content[] = [{ role: "user", parts: [{ text: prompt }] }];
 
     await initGoogleChat(id, kvMessages);
     const answer = await generateResponse(initialMessages);
@@ -115,9 +114,10 @@ export async function googleReply(id: number, prompt: string, ctx?: Context) {
     const messagesResult = await getGoogleChat(id);
 
     // Build parts with optional image
-    const parts: Array<
-      { text?: string; inlineData?: { mimeType: string; data: string } }
-    > = [];
+    const parts: Array<{
+      text?: string;
+      inlineData?: { mimeType: string; data: string };
+    }> = [];
 
     if (ctx?.message?.photo) {
       const photoArray = ctx.message.photo;
