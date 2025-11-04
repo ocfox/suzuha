@@ -2,9 +2,7 @@ import {
   Bot,
   Context,
   webhookCallback,
-} from "https://deno.land/x/grammy@v1.34.1/mod.ts";
-
-import telegramifyMarkdown from 'telegramify-markdown';
+} from "grammy";
 
 import { groqChat, groqTranslate, whisper } from "./groq.ts";
 import { setGoogleReply, setReply } from "./kv.ts";
@@ -12,28 +10,19 @@ import { getGoogleChat, googleChatWrapper, googleReply } from "./aistudio.ts";
 import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
 import { InputFile } from "https://deno.land/x/grammy@v1.34.1/types.deno.ts";
-import {
-  hydrateReply,
-  parseMode,
-} from "https://deno.land/x/grammy_parse_mode@1.11.1/mod.ts";
-import type { ParseModeFlavor } from "https://deno.land/x/grammy_parse_mode@1.11.1/mod.ts";
+import { marked } from "marked";
+import { TelegramRenderer } from "./render.ts";
 
-const bot = new Bot<ParseModeFlavor<Context>>(Deno.env.get("BOT_TOKEN") || "");
-
-bot.use(hydrateReply);
-
-// Set the default parse mode for ctx.reply.
-// bot.api.config.use(parseMode("MarkdownV2"));
-
-// Helper function to send messages with markdown and fallback to plain text
+const bot = new Bot<Context>(Deno.env.get("BOT_TOKEN") || "");
 const send = async (
   ctx: Context,
   text: string,
   replyToMessageId: number,
 ) => {
-  const reply = await ctx.reply(text, {
+  const html = await marked(text, { renderer: new TelegramRenderer() });
+  const reply = await ctx.reply(html, {
     reply_parameters: { message_id: replyToMessageId },
-    parse_mode: undefined,
+    parse_mode: "HTML",
   });
   return reply;
 };
