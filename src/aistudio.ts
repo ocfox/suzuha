@@ -93,7 +93,12 @@ export async function googleChatWrapper(
       { role: "user", parts },
     ];
 
-    await initGoogleChat(id, initialMessages);
+    // Store only text parts in KV (images are too large)
+    const kvMessages: Content[] = [
+      { role: "user", parts: [{ text: prompt }] },
+    ];
+
+    await initGoogleChat(id, kvMessages);
     const answer = await generateResponse(initialMessages);
     await appendGoogleMessage(id, "model", answer);
 
@@ -104,15 +109,34 @@ export async function googleChatWrapper(
   }
 }
 
-export async function googleReply(id: number, prompt: string) {
+export async function googleReply(id: number, prompt: string, ctx?: Context) {
   try {
     const messagesResult = await getGoogleChat(id);
+
+    // Build parts with optional image
+    const parts: Array<
+      { text?: string; inlineData?: { mimeType: string; data: string } }
+    > = [];
+
+    if (ctx?.message?.photo) {
+      const photoArray = ctx.message.photo;
+      const largestPhoto = photoArray[photoArray.length - 1];
+      const [base64Data, mimeType] = await getFileAsBase64(
+        ctx,
+        largestPhoto.file_id,
+      );
+      parts.push({ inlineData: { mimeType, data: base64Data } });
+    }
+
+    parts.push({ text: prompt });
+
+    // Store only text in KV
     await appendGoogleMessage(id, "user", prompt);
 
     const messages: Content[] =
       messagesResult.value && messagesResult.value.length > 0
-        ? [...messagesResult.value, { role: "user", parts: [{ text: prompt }] }]
-        : [{ role: "user", parts: [{ text: prompt }] }];
+        ? [...messagesResult.value, { role: "user", parts }]
+        : [{ role: "user", parts }];
 
     const answer = await generateResponse(messages);
     await appendGoogleMessage(id, "model", answer);

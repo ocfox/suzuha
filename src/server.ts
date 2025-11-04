@@ -250,7 +250,6 @@ bot.on(":text", async (ctx) => {
 
   if (
     ctx.message?.reply_to_message &&
-    !ctx.message.reply_to_message.photo &&
     ctx.message.reply_to_message.from?.id === bot.botInfo.id
   ) {
     try {
@@ -258,7 +257,7 @@ bot.on(":text", async (ctx) => {
       await setReply(ctx.message.reply_to_message.message_id, ctx.msgId);
       await setGoogleReply(ctx.message.reply_to_message.message_id, ctx.msgId);
 
-      googleReply(ctx.msgId, ctx.message.text)
+      googleReply(ctx.msgId, ctx.message.text, ctx)
         .then(async (response) => {
           const reply = await send(ctx, response, ctx.msgId);
           // Link the new reply in both systems
