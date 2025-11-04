@@ -4,7 +4,7 @@ import {
   webhookCallback,
 } from "grammy";
 
-import { groqChat, groqTranslate, whisper } from "./groq.ts";
+import { groqTranslate, whisper } from "./groq.ts";
 import { setGoogleReply, setReply } from "./kv.ts";
 import { getGoogleChat, googleChatWrapper, googleReply } from "./aistudio.ts";
 import { dict } from "./dict.ts";
@@ -14,6 +14,7 @@ import { marked } from "marked";
 import { TelegramRenderer } from "./render.ts";
 
 const bot = new Bot<Context>(Deno.env.get("BOT_TOKEN") || "");
+
 const send = async (
   ctx: Context,
   text: string,
@@ -27,6 +28,21 @@ const send = async (
   return reply;
 };
 
+const handleChatCommand = async (ctx: Context, prompt: string) => {
+  if (!ctx.msgId) return;
+  try {
+    const response = await googleChatWrapper(ctx.msgId, prompt);
+    const reply = await send(ctx, response, ctx.msgId);
+    await setReply(ctx.msgId, reply.message_id);
+    await setGoogleReply(ctx.msgId, reply.message_id);
+  } catch (error) {
+    await ctx.reply(
+      `Failed to process: ${error instanceof Error ? error.message : "Unknown error"}`,
+      { reply_parameters: { message_id: ctx.msgId } }
+    );
+  }
+};
+
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
@@ -38,97 +54,37 @@ const getFile = async (ctx: Context, fileId: string) => {
 
 bot.command("chat", (ctx) => {
   const prompt = ctx.message?.text?.split(" ").slice(1).join(" ");
-  if (!prompt) {
-    return ctx.reply(dict.zh.empty);
-  }
-
-  googleChatWrapper(ctx.msgId, prompt)
-    .then(async (response) => {
-      const reply = await send(ctx, response, ctx.msgId);
-      // Link both ways - standard and Google chat linking
-      await setReply(ctx.msgId, reply.message_id);
-      // This ensures that when someone replies to the bot's response,
-      // it can find the original message that started the conversation
-      await setGoogleReply(ctx.msgId, reply.message_id);
-    })
-    .catch(async (error) => {
-      await ctx.reply(
-        `Failed to process chat: ${error instanceof Error ? error.message : "Unknown error"
-        }`,
-        {
-          reply_parameters: { message_id: ctx.msgId },
-        },
-      );
-    });
+  if (!prompt) return ctx.reply(dict.zh.empty);
+  handleChatCommand(ctx, prompt);
 });
 
 bot.command("what", (ctx) => {
-  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
+  if (!ctx.message?.reply_to_message?.text) {
     return ctx.reply("Please reply to a message to ask what it means");
   }
   const prompt = ctx.message.reply_to_message.text + "\n" + dict.zh.what;
-
-  groqChat(ctx.msgId, prompt)
-    .then(async (response) => {
-      await send(ctx, response, ctx.msgId);
-    })
-    .catch(async (error) => {
-      await ctx.reply(
-        `Failed to process request: ${error instanceof Error ? error.message : "Unknown error"
-        }`,
-        {
-          reply_parameters: { message_id: ctx.msgId },
-        },
-      );
-    });
+  handleChatCommand(ctx, prompt);
 });
 
-bot.command("why", async (ctx) => {
-  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
+bot.command("why", (ctx) => {
+  if (!ctx.message?.reply_to_message?.text) {
     return ctx.reply("Please reply to a message to ask why");
   }
   const prompt = dict.zh.why + ctx.message.reply_to_message.text + "?";
-
-  try {
-    const response = await groqChat(ctx.msgId, prompt);
-    await send(ctx, response, ctx.msgId);
-  } catch (error) {
-    await ctx.reply(
-      `Failed to process request: ${error instanceof Error ? error.message : "Unknown error"
-      }`,
-      {
-        reply_parameters: { message_id: ctx.msgId },
-      },
-    );
-  }
+  handleChatCommand(ctx, prompt);
 });
 
 bot.command("ah", (ctx) => {
-  if (!ctx.message?.reply_to_message || !ctx.message.reply_to_message.text) {
+  if (!ctx.message?.reply_to_message?.text) {
     return ctx.reply("Please reply to a message to use this command");
   }
-  const question = ctx.message.reply_to_message.text;
-  let prompt = question;
-
-  if (question.endsWith("吧")) {
-    prompt = question.slice(0, -1) + "吗?";
-  } else if (!question.endsWith("?") && !question.endsWith("？")) {
-    prompt = question + "?";
+  let prompt = ctx.message.reply_to_message.text;
+  if (prompt.endsWith("吧")) {
+    prompt = prompt.slice(0, -1) + "吗?";
+  } else if (!prompt.endsWith("?") && !prompt.endsWith("？")) {
+    prompt = prompt + "?";
   }
-
-  groqChat(ctx.msgId, prompt)
-    .then(async (response) => {
-      await send(ctx, response, ctx.msgId);
-    })
-    .catch(async (error) => {
-      await ctx.reply(
-        `Failed to process request: ${error instanceof Error ? error.message : "Unknown error"
-        }`,
-        {
-          reply_parameters: { message_id: ctx.msgId },
-        },
-      );
-    });
+  handleChatCommand(ctx, prompt);
 });
 
 bot.command("image", async (ctx) => {
