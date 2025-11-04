@@ -1,15 +1,11 @@
-import {
-  Bot,
-  Context,
-  webhookCallback,
-} from "grammy";
+import { Bot, Context, webhookCallback } from "grammy";
 
 import { groqTranslate, whisper } from "./groq.ts";
 import { setGoogleReply, setReply } from "./kv.ts";
 import { getGoogleChat, googleChatWrapper, googleReply } from "./aistudio.ts";
 import { dict } from "./dict.ts";
 import { fluxImage, StableDiffusionXLImg2Img } from "./huggingface.ts";
-import { InputFile } from "https://deno.land/x/grammy@v1.34.1/types.deno.ts";
+import { InputFile, type PhotoSize } from "grammy/types";
 import { marked } from "marked";
 import { TelegramRenderer } from "./render.ts";
 
@@ -28,17 +24,28 @@ const send = async (
   return reply;
 };
 
-const handleChatCommand = async (ctx: Context, prompt: string) => {
+const handleChatCommand = async (
+  ctx: Context,
+  prompt: string,
+  photoArray?: PhotoSize[],
+) => {
   if (!ctx.msgId) return;
   try {
-    const response = await googleChatWrapper(ctx.msgId, prompt, ctx);
+    // Create a modified context if we have a photo from reply
+    const ctxToUse = photoArray
+      ? { ...ctx, message: { ...ctx.message, photo: photoArray } } as Context
+      : ctx;
+
+    const response = await googleChatWrapper(ctx.msgId, prompt, ctxToUse);
     const reply = await send(ctx, response, ctx.msgId);
     await setReply(ctx.msgId, reply.message_id);
     await setGoogleReply(ctx.msgId, reply.message_id);
   } catch (error) {
     await ctx.reply(
-      `Failed to process: ${error instanceof Error ? error.message : "Unknown error"}`,
-      { reply_parameters: { message_id: ctx.msgId } }
+      `Failed to process: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
+      { reply_parameters: { message_id: ctx.msgId } },
     );
   }
 };
@@ -46,7 +53,8 @@ const handleChatCommand = async (ctx: Context, prompt: string) => {
 const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
-    `https://api.telegram.org/file/bot${Deno.env.get("BOT_TOKEN")
+    `https://api.telegram.org/file/bot${
+      Deno.env.get("BOT_TOKEN")
     }/${file.file_path}`,
   );
   return response.blob();
@@ -59,11 +67,20 @@ bot.command("chat", (ctx) => {
 });
 
 bot.command("what", (ctx) => {
-  if (!ctx.message?.reply_to_message?.text) {
+  const replyMsg = ctx.message?.reply_to_message;
+  if (!replyMsg) {
     return ctx.reply("Please reply to a message to ask what it means");
   }
-  const prompt = ctx.message.reply_to_message.text + "\n" + dict.zh.what;
-  handleChatCommand(ctx, prompt);
+
+  // Get additional prompt from command if provided
+  const additionalPrompt = ctx.message?.text?.split(" ").slice(1).join(" ");
+
+  // If has photo, use additional prompt or default question; otherwise use text + question
+  const prompt = replyMsg.photo
+    ? (additionalPrompt || dict.zh.what)
+    : `${replyMsg.text || ""}\n${dict.zh.what}`;
+
+  handleChatCommand(ctx, prompt, replyMsg.photo);
 });
 
 bot.command("why", (ctx) => {
@@ -100,7 +117,8 @@ bot.command("image", async (ctx) => {
     });
   } catch (error) {
     await ctx.reply(
-      `Failed to generate image: ${error instanceof Error ? error.message : "Unknown error"
+      `Failed to generate image: ${
+        error instanceof Error ? error.message : "Unknown error"
       }`,
       {
         reply_parameters: { message_id: ctx.msgId },
@@ -126,7 +144,8 @@ bot.command("i2i", async (ctx) => {
     });
   } catch (error) {
     await ctx.reply(
-      `Failed to process image: ${error instanceof Error ? error.message : "Unknown error"
+      `Failed to process image: ${
+        error instanceof Error ? error.message : "Unknown error"
       }`,
       {
         reply_parameters: { message_id: ctx.msgId },
@@ -149,7 +168,8 @@ bot.command("whisper", async (ctx) => {
     await send(ctx, text, ctx.msgId);
   } catch (error) {
     await ctx.reply(
-      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"
+      `Failed to transcribe audio: ${
+        error instanceof Error ? error.message : "Unknown error"
       }`,
       {
         reply_parameters: { message_id: ctx.msgId },
@@ -170,7 +190,8 @@ bot.command("translate", (ctx) => {
     })
     .catch(async (error) => {
       await ctx.reply(
-        `Translation error: ${error instanceof Error ? error.message : "Unknown error"
+        `Translation error: ${
+          error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },
@@ -216,7 +237,8 @@ bot.on(":text", async (ctx) => {
     } catch (error) {
       console.error("Error retrieving chat history:", error);
       await ctx.reply(
-        `Failed to retrieve chat history: ${error instanceof Error ? error.message : "Unknown error"
+        `Failed to retrieve chat history: ${
+          error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },
@@ -245,7 +267,8 @@ bot.on(":text", async (ctx) => {
         })
         .catch(async (error) => {
           await ctx.reply(
-            `Error: ${error instanceof Error ? error.message : "Unknown error"
+            `Error: ${
+              error instanceof Error ? error.message : "Unknown error"
             }`,
             {
               reply_parameters: { message_id: ctx.msgId },
@@ -255,7 +278,8 @@ bot.on(":text", async (ctx) => {
     } catch (error) {
       console.error("Error in text message handling:", error);
       await ctx.reply(
-        `Failed to process message: ${error instanceof Error ? error.message : "Unknown error"
+        `Failed to process message: ${
+          error instanceof Error ? error.message : "Unknown error"
         }`,
         {
           reply_parameters: { message_id: ctx.msgId },

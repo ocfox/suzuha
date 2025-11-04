@@ -12,6 +12,7 @@
     "@azure-rest/ai-inference": "npm:@azure-rest/ai-inference@1.0.0-beta.1",
     "@azure/core-auth": "npm:@azure/core-auth@1.7.2",
     "grammy": "https://deno.land/x/grammy/mod.ts",
+    "grammy/types": "https://deno.land/x/grammy@v1.34.1/types.deno.ts",
     "marked": "npm:marked@^15.0.6"
   }
 }

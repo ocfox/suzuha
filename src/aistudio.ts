@@ -33,17 +33,17 @@ const getFileAsBase64 = async (
 };
 
 const config = {
-	thinkingConfig: {
-		thinkingBudget: -1,
-	},
-	tools: [
-		{
-			googleSearch: {},
-		},
-	],
-	systemInstruction: [
-		{
-			text: `
+  thinkingConfig: {
+    thinkingBudget: -1,
+  },
+  tools: [
+    {
+      googleSearch: {},
+    },
+  ],
+  systemInstruction: [
+    {
+      text: `
 Important: When presenting long content (more than 4 lines or 200 characters), always wrap it in a blockquote using > at the start of each line. This applies to:
 - Long explanations
 - Multi-paragraph responses
@@ -52,8 +52,8 @@ Important: When presenting long content (more than 4 lines or 200 characters), a
 
 Respond in the same language as the user's prompt(Chinese first). When presenting mathematical equations, use inline notation or code blocks as appropriate.
 `,
-		},
-	],
+    },
+  ],
 };
 
 const generateResponse = async (messages: Content[]) => {
@@ -65,15 +65,24 @@ const generateResponse = async (messages: Content[]) => {
   return response.text || dict.zh.unknown;
 };
 
-export async function googleChatWrapper(id: number, prompt: string, ctx?: Context) {
+export async function googleChatWrapper(
+  id: number,
+  prompt: string,
+  ctx?: Context,
+) {
   try {
-    const parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [];
+    const parts: Array<
+      { text?: string; inlineData?: { mimeType: string; data: string } }
+    > = [];
 
     // Add image if present
     if (ctx?.message?.photo) {
       const photoArray = ctx.message.photo;
       const largestPhoto = photoArray[photoArray.length - 1];
-      const [base64Data, mimeType] = await getFileAsBase64(ctx, largestPhoto.file_id);
+      const [base64Data, mimeType] = await getFileAsBase64(
+        ctx,
+        largestPhoto.file_id,
+      );
       parts.push({ inlineData: { mimeType, data: base64Data } });
     }
 
@@ -100,9 +109,10 @@ export async function googleReply(id: number, prompt: string) {
     const messagesResult = await getGoogleChat(id);
     await appendGoogleMessage(id, "user", prompt);
 
-    const messages: Content[] = messagesResult.value && messagesResult.value.length > 0
-      ? [...messagesResult.value, { role: "user", parts: [{ text: prompt }] }]
-      : [{ role: "user", parts: [{ text: prompt }] }];
+    const messages: Content[] =
+      messagesResult.value && messagesResult.value.length > 0
+        ? [...messagesResult.value, { role: "user", parts: [{ text: prompt }] }]
+        : [{ role: "user", parts: [{ text: prompt }] }];
 
     const answer = await generateResponse(messages);
     await appendGoogleMessage(id, "model", answer);

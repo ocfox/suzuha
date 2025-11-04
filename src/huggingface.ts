@@ -1,7 +1,4 @@
-import {
-  HfInference,
-  TranslationArgs,
-} from "@huggingface/inference";
+import { HfInference, TranslationArgs } from "@huggingface/inference";
 
 const token = Deno.env.get("HUGGINGFACE_TOKEN") || "";
 
