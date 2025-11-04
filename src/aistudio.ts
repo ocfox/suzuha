@@ -2,7 +2,8 @@ import { Content, GoogleGenAI } from "@google/genai";
 import { appendGoogleMessage, getGoogleChat, initGoogleChat } from "./kv.ts";
 import { dict } from "./dict.ts";
 import { Context } from "grammy";
-import { contentType } from "@std/media-types";
+import { typeByExtension } from "@std/media-types";
+import { extname } from "@std/path";
 import { encodeBase64 } from "@std/encoding/base64";
 
 export { getGoogleChat } from "./kv.ts";
@@ -28,7 +29,7 @@ const getFileAsBase64 = async (
 
   return [
     encodeBase64(await response.arrayBuffer()),
-    contentType(file.file_path) || "image/jpeg",
+    typeByExtension(extname(file.file_path)) || "image/jpeg",
   ];
 };
 
