@@ -188,21 +188,8 @@ export class TelegramRenderer extends Renderer {
     return "";
   }
 
-  override table(token: Tokens.Table): string {
-    const renderCell = (cell: Tokens.TableCell) =>
-      this.parser.parseInline(cell.tokens);
-
-    const renderRow = (cells: Tokens.TableCell[]) =>
-      cells.map(renderCell).join(" │ ");
-
-    const header = token.header
-      .map((cell) => wrapTag("b", renderCell(cell)))
-      .join(" │ ");
-
-    const separator = "─".repeat(Math.min(header.length, 40));
-    const rows = token.rows.map(renderRow).join("\n");
-
-    return `${header}\n${separator}\n${rows}\n\n`;
+  override table(_token: Tokens.Table): string {
+    return "";
   }
 
   override tablerow(token: Tokens.TableRow): string {

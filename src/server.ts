@@ -13,11 +13,10 @@ const bot = new Bot<Context>(Deno.env.get("BOT_TOKEN") || "");
 
 const send = async (ctx: Context, text: string, replyToMessageId: number) => {
   const html = await marked(text, { renderer: new TelegramRenderer() });
-  const reply = await ctx.reply(html, {
+  return await ctx.reply(html, {
     reply_parameters: { message_id: replyToMessageId },
     parse_mode: "HTML",
   });
-  return reply;
 };
 
 const handleChatCommand = async (
@@ -50,9 +49,7 @@ const getFile = async (ctx: Context, fileId: string) => {
   const file = await ctx.api.getFile(fileId);
   const response = await fetch(
     `https://api.telegram.org/file/bot${
-      Deno.env.get(
-        "BOT_TOKEN",
-      )
+      Deno.env.get("BOT_TOKEN")
     }/${file.file_path}`,
   );
   return response.blob();
@@ -189,6 +186,12 @@ bot.command("translate", (ctx) => {
     : "Translate the text in this image to Chinese";
 
   handleChatCommand(ctx, prompt, replyMsg.photo);
+});
+
+bot.command("html", (ctx) => {
+  if (!ctx.message) return;
+  const html = ctx.message?.text?.split(" ").slice(1).join(" ");
+  send(ctx, html, ctx.msgId);
 });
 
 bot.command("help", (ctx) => {
