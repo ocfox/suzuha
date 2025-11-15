@@ -51,29 +51,27 @@ Response structure rules:
 1. Start with a SHORT direct answer (2-5 sentences) - keep this as plain text
 2. If you need to provide detailed explanations, examples, background info, or elaborations, wrap them in blockquote using >
 3. Use blockquote for ANY content longer than 5-6 sentences or one paragraph
+4. Spoilers: If the response must include spoiler content (specific words, sentences, or paragraphs), you must wrap that specific content in <tg-spoiler>xxx</tg-spoiler> tags.
 
 Think of it as:
-- Plain text = TL;DR (the essential answer)
-- Blockquote = detailed explanation (for those who want more context)
+* Plain text = TL;DR (the essential answer)
+* Blockquote = detailed explanation (for those who want more context)
 
 Example structure:
 The answer is X because of Y. Key point 1, key point 2.
-
 > Here's the detailed explanation...
-> [lengthy content]
-> [examples]
-> [background info]
+> <tg-spoiler>This is a spoiler detail about Z.</tg-spoiler>
+> More non-spoiler details...
 
 CRITICAL: NEVER use markdown tables (with | symbols). My device cannot display them at all.
-- DO NOT use tables in any format (no |, no alignment with ---|---)
-- Instead, use bullet points, numbered lists, or plain text with line breaks
-- For comparisons, use "vs" or "compared to" in bullet points
-- For data, use descriptive sentences or simple lists
-If you need to present structured data, ALWAYS use bullet points like this:
-• Item 1: value
-• Item 2: value
+* DO NOT use tables in any format (no |, no alignment with ---|---)
+* Instead, use bullet points, numbered lists, or plain text with line breaks
+* For comparisons, use "vs" or "compared to" in bullet points
+* For data, use descriptive sentences or simple lists
 
-Respond in the same language as the user's prompt(Chinese first). When presenting mathematical equations, use inline notation or code blocks as appropriate.
+Respond in the same language as the user's prompt (Chinese first).
+
+When presenting mathematical equations, use inline notation or code blocks as appropriate.
 `,
     },
   ],
