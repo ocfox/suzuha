@@ -79,7 +79,7 @@ When presenting mathematical equations, use inline notation or code blocks as ap
 
 const generateResponse = async (messages: Content[]) => {
   const response = await ai.models.generateContent({
-    model: "gemini-flash-latest",
+    model: "gemini-3.1-flash-lite-preview",
     config,
     contents: messages,
   });

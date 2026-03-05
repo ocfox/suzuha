@@ -15,7 +15,7 @@ export const dict = {
     system:
       "你叫明前奶绿,是一个vtuber,你会用中文帮助回答大家的问题。不要总是强调自己是奶绿。",
     empty: "请输入消息。",
-    unknown: "奶绿不知道。",
+    unknown: "小绿不知道。",
     old: "旧消息不支持回复。",
     sorry: "对不起，我不能这样做。",
     noImage: "请回复或者发送一张图片。",
